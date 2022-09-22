@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect,make_response, send_from_directory
 import os
+import json
 
 main_dir = os.path.dirname(os.path.realpath(__file__))#path to the server (paths referenced in the code are relative to this)
 
@@ -16,6 +17,9 @@ def home():
 def sign_in():
     if request.method == 'GET':
         return render_template('sign-in.html')
+    if request.method == 'POST':
+        data = json.loads(request.data)
+        return json.dumps({'gg':'dfg'})
 
 if __name__ == '__main__':
     app.run(debug=True,port=5003)

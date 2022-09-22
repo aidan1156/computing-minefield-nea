@@ -60,6 +60,7 @@ button{
     width:100%;
     box-sizing: border-box;
     padding:0.8em;
+    cursor:pointer
 }
 
 .input{
@@ -80,6 +81,7 @@ button{
     pointer-events: none;
     font-size: 0.9em;
     line-height: 1;
+    transition: 0.2s all;
 }
 
 .input > input{
@@ -97,6 +99,19 @@ button{
     outline:none;
 }
 
+@supports selector(:has(input:focus)){
+    .input:has(input:not(:focus):valid)::after{
+        top:50%;
+        padding-bottom: 0.5em;
+    }
+}
+
+
+#error_message{
+    color:var(--primary-text);
+    margin-top:1em;
+}
+
     </style>
 </head>
 <body>
@@ -106,14 +121,43 @@ button{
             <h2>Sign in to continue</h2>
         </div>
         <div class='input' data-placeholder='Username'>
-            <input type='text' id='username'>
+            <input type='text' id='username' pattern="^$">
         </div>
         <div class='input' data-placeholder='Password'>
-            <input type='password' id='password'>
+            <input type='password' id='password' pattern="^$">
         </div>
-        <button>
+        <div id='error_message'>
+
+        </div>
+        <button onclick='sign_in()'>
             Sign-in
         </button>
     </main>
+<script>
+
+function sign_in(){
+    password = document.querySelector('#password').value
+    username = document.querySelector('#username').value
+
+    if (username && password){
+        document.getElementById('error_message').innerText = ''
+        fetch('/sign-in',{
+            method:'POST',
+            body:JSON.stringify({
+                username:username,
+                password:password
+            })
+        }).then((data) => {
+            data.text().then((data) => {
+                data = JSON.parse(data)
+            })
+        })
+    }
+    else{
+        document.getElementById('error_message').innerText = 'Please enter your username and password'
+    }
+}
+
+</script>
 </body>
 </html>
