@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+@font-face { 
+    font-family: bierstadt; 
+    src: url('/static/bierstadt.ttf'),local('Arial'),local('sans-serif'),local('system-ui'); 
+    font-style: normal;
+}
+
+body {
+    background-color: white;
+    font-size:clamp(0.9rem,1.2vw,1.1rem);
+    line-height: 1.6;
+    color: var(--primary-text);
+    font-weight: 500;
+    font-family: bierstadt, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',Arial, sans-serif;
+    margin:0px;
+    -webkit-tap-highlight-color:transparent;
+    --primary-text:#221C1A;
+    --card-clr:#F9E9DA;
+    --secondary-clr:#F9F0F0;
+    --accent-clr:#FBE3B7;
+    --button-clr:#FBABAD;
+}
+
+h1{
+    margin:0;
+    font-weight: inherit;
+    font-family: inherit;
+}
+
+
+/* nav bar styling */
+nav{
+    position:fixed;
+    inset:0;
+    height:5em;
+    display:flex;
+    place-content: center;
+}
+
+nav h1{
+    display:inline;
+    font-size: 1.2em;
+    margin:auto 1em;
+    flex:1;
+    max-width: 10em;
+}
+
+nav input{
+    width:auto;
+    border:none;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    background-color: transparent;
+    flex:1;
+    color:var(--primary-text);
+    margin-left:0.5em;
+}
+
+nav input:focus{
+    outline:none;
+}
+
+nav input::placeholder{
+    font-style: italic;
+    color:var(--primary-text)
+}
+
+
+#nav_wrapper{
+    display:flex;
+    flex:5;
+    place-content: center;
+    padding:0 1em;
+
+}
+
+#search_bar{
+    background-color: var(--secondary-clr);
+    border-radius: 100vmax;
+    height:3em; 
+    max-width: 25em;
+    margin:auto 0;
+    padding:0.5em 1em;
+    box-sizing: border-box;
+    display:flex;
+    align-content: center;
+    flex:1;
+    box-shadow: 0px 10px 15px -10px rgba(0,0,0,0.2);
+}
+
+#search_bar > img{
+    height:100%;   
+    margin:auto 0 auto auto; 
+}
+
+#nav_wrapper > img{
+    margin:auto 0 auto auto;
+    height:2em;
+}
+
+@media (max-width:700px){
+    nav > h1{
+        display:none;
+    }
+    #nav_wrapper{
+        background-color: var(--secondary-clr);
+        margin:1em;
+        border-radius: 100vmax;
+        height:3.5em;
+        padding:0 0.5em;
+    }
+    #search_bar{
+        padding:0.5em;
+    }
+    #search_bar > img{
+        order: 1;
+        margin:0;
+    }
+    #search_bar > input{
+        order: 2;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Minefield App</h1>
+        <div id='nav_wrapper'>
+            <div id="search_bar">
+                <input type="text" placeholder='Search Designs'>
+                <img src='/static/ui_icons/search.svg'>
+            </div>
+            <img src='/static/ui_icons/account.svg'>
+        </div>
+    </nav>
+</body>
+</html>
