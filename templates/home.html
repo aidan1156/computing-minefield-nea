@@ -14,7 +14,7 @@
 
 body {
     background-color: white;
-    font-size:clamp(0.9rem,1.2vw,1.1rem);
+    font-size:clamp(0.9rem,1.3vw,1.1rem);
     line-height: 1.6;
     color: var(--primary-text);
     font-weight: 500;
@@ -26,6 +26,7 @@ body {
     --secondary-clr:#F9F0F0;
     --accent-clr:#FBE3B7;
     --button-clr:#FBABAD;
+    --hover-shadow:0 1px 3px 0 rgb(60 64 67 / 10%), 0 4px 8px 3px rgb(60 64 67 / 5%);
 }
 
 h1{
@@ -93,7 +94,7 @@ h1{
     display:flex;
     align-content: center;
     flex:1;
-    box-shadow: 0px 10px 15px -10px rgba(0,0,0,0.2);
+    box-shadow: var(--hover-shadow);
 }
 
 #search_bar > img{
@@ -135,7 +136,7 @@ h1{
         box-shadow: none;
     }
     #nav_wrapper{
-        box-shadow: 0px 10px 15px -10px rgba(0,0,0,0.2);
+        box-shadow: var(--hover-shadow);
     }
 }
 
@@ -143,7 +144,7 @@ h1{
 
 main{
     margin-top:5em;
-    padding:0.8em;
+    padding:1em;
 }
 
 #new_design_buttons{
@@ -151,22 +152,37 @@ main{
     gap:0.5em;
 }
 
-#new_design_buttons > div{
+.button_card{
     background-color: var(--card-clr);
     border-radius: 0.3em;
-    max-width:15em;
+    max-width:12em;
     flex:1;
     text-align: center;
+    padding:1.5em 0.5em;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: 0.2s box-shadow;
 }
 
-#new_design_buttons > div > *{
+.button_card:hover{
+    box-shadow: var(--hover-shadow);
+}
+
+.button_card > *{
     display:block;
     margin:auto;
+}
+
+.button_card > img{
+    height:3em;
 }
 
 @media (max-width:700px){
     main{
         margin-top:0;
+    }
+    .button_card{
+        max-width: unset;
     }
 }
 
@@ -185,16 +201,41 @@ main{
     </div>
     <main>
         <div id="new_design_buttons">
-            <div>
+            <div class='button_card'>
                 <img src="/static/ui_icons/add.svg">
                 Create new
             </div>
-            <div>
+            <div class='button_card'>
                 <img src="/static/ui_icons/automatic.svg">
                 Auto generate
             </div>
         </div>
+        <div id='design_grid'>
+
+        </div>
     </main>
+
+<script>
+function post_request(url,callback,data){
+    fetch(url,{
+        'method':'POST',
+        'body':JSON.stringify(data)
+    }).then((data) => {
+        data.text().then((text) => {callback(text)})
+    })
+}
+
+post_request('/',function(data){
+    console.log(data)
+    data = JSON.parse(data)
+    if (data['state'] == 'done'){
+        for (i=0;i<data['designs'].length;i++){
+            
+        }
+    }
+},{'request_type':'get_designs','user_token':localStorage.getItem('user_token')})
+
+</script>
 
 </body>
 </html>

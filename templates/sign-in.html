@@ -102,13 +102,13 @@ button{
 @supports selector(:has(input:focus)){
     .input:has(input:not(:focus):valid)::after{
         top:50%;
-        padding-bottom: 0.5em;
+        padding-bottom: 0.2em;
     }
 }
 
 
 #error_message{
-    color:var(--primary-text);
+    color:#E64242;
     margin-top:1em;
 }
 
@@ -136,6 +136,7 @@ button{
 <script>
 
 function sign_in(){
+    //send a request to the server authenticating the user
     password = document.querySelector('#password').value
     username = document.querySelector('#username').value
 
@@ -150,13 +151,32 @@ function sign_in(){
         }).then((data) => {
             data.text().then((data) => {
                 data = JSON.parse(data)
+                if (data['state'] == 'done'){
+                    localStorage.setItem('user_token',data['user_token'])
+                    window.location.pathname = '/'
+                }
+                else{
+                    document.getElementById('error_message').innerText = data['state']//log the error to the user
+                }
             })
-        })
+        }).catch(
+            function(){
+                document.getElementById('error_message').innerText = 'Unable to access server'
+            }
+        )
     }
     else{
         document.getElementById('error_message').innerText = 'Please enter your username and password'
     }
 }
+
+document.body.addEventListener('keydown',function(evt){
+    evt = evt || window.event;
+    key = evt.key
+    if (key == 'Enter'){
+        sign_in()
+    }
+});
 
 </script>
 </body>
