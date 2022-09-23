@@ -36,7 +36,7 @@ h1{
 
 
 /* nav bar styling */
-nav{
+#top_bar{
     position:fixed;
     inset:0;
     height:5em;
@@ -44,7 +44,7 @@ nav{
     place-content: center;
 }
 
-nav h1{
+#top_bar h1{
     display:inline;
     font-size: 1.2em;
     margin:auto 1em;
@@ -52,7 +52,7 @@ nav h1{
     max-width: 10em;
 }
 
-nav input{
+#top_bar input{
     width:auto;
     border:none;
     font-family: inherit;
@@ -64,11 +64,11 @@ nav input{
     margin-left:0.5em;
 }
 
-nav input:focus{
+#top_bar input:focus{
     outline:none;
 }
 
-nav input::placeholder{
+#top_bar input::placeholder{
     font-style: italic;
     color:var(--primary-text)
 }
@@ -107,18 +107,18 @@ nav input::placeholder{
 }
 
 @media (max-width:700px){
-    nav{
+    #top_bar{
         position:relative;
     }
-    nav > h1{
+    #top_bar > h1{
         display:none;
     }
     #nav_wrapper{
         background-color: var(--secondary-clr);
         margin:1em;
         border-radius: 100vmax;
-        height:3.5em;
-        padding:0 0.5em;
+        height:3.2em;
+        padding:0 0.3em;
     }
     #search_bar{
         padding:0.5em;
@@ -141,11 +141,27 @@ nav input::placeholder{
 
 /* main styling */
 
-
 main{
-    height:150vh;
     margin-top:5em;
-    background-color: aqua;
+    padding:0.8em;
+}
+
+#new_design_buttons{
+    display:flex;
+    gap:0.5em;
+}
+
+#new_design_buttons > div{
+    background-color: var(--card-clr);
+    border-radius: 0.3em;
+    max-width:15em;
+    flex:1;
+    text-align: center;
+}
+
+#new_design_buttons > div > *{
+    display:block;
+    margin:auto;
 }
 
 @media (max-width:700px){
@@ -157,7 +173,7 @@ main{
     </style>
 </head>
 <body>
-    <nav>
+    <div id="top_bar">
         <h1>Minefield App</h1>
         <div id='nav_wrapper'>
             <div id="search_bar">
@@ -166,9 +182,19 @@ main{
             </div>
             <img src='/static/ui_icons/account.svg'>
         </div>
-    </nav>
+    </div>
     <main>
-        
+        <div id="new_design_buttons">
+            <div>
+                <img src="/static/ui_icons/add.svg">
+                Create new
+            </div>
+            <div>
+                <img src="/static/ui_icons/automatic.svg">
+                Auto generate
+            </div>
+        </div>
     </main>
+
 </body>
 </html>
