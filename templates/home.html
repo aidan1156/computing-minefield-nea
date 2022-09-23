@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Minefield App</title>
     <style>
 @font-face { 
     font-family: bierstadt; 
@@ -107,6 +107,9 @@ nav input::placeholder{
 }
 
 @media (max-width:700px){
+    nav{
+        position:relative;
+    }
     nav > h1{
         display:none;
     }
@@ -122,10 +125,32 @@ nav input::placeholder{
     }
     #search_bar > img{
         order: 1;
-        margin:0;
+        margin:auto 0;
+        height:90%;
     }
     #search_bar > input{
         order: 2;
+    }
+    #search_bar{
+        box-shadow: none;
+    }
+    #nav_wrapper{
+        box-shadow: 0px 10px 15px -10px rgba(0,0,0,0.2);
+    }
+}
+
+/* main styling */
+
+
+main{
+    height:150vh;
+    margin-top:5em;
+    background-color: aqua;
+}
+
+@media (max-width:700px){
+    main{
+        margin-top:0;
     }
 }
 
@@ -142,5 +167,8 @@ nav input::placeholder{
             <img src='/static/ui_icons/account.svg'>
         </div>
     </nav>
+    <main>
+        
+    </main>
 </body>
 </html>
