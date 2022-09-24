@@ -149,12 +149,12 @@ main{
 
 #new_design_buttons{
     display:flex;
-    gap:0.5em;
+    gap:0.8em;
 }
 
 .button_card{
     background-color: var(--card-clr);
-    border-radius: 0.3em;
+    border-radius: 0.5em;
     max-width:12em;
     flex:1;
     text-align: center;
@@ -185,6 +185,123 @@ main{
         max-width: unset;
     }
 }
+
+
+#design_grid{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin-top:2em;
+    gap:0.8em;
+}
+
+@media (max-width:1500px){
+    #design_grid{
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width:1300px){
+    #design_grid{
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width:700px){
+    #design_grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.design_card{
+    width:100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 0.5em;
+    overflow: hidden;
+    transition:0.2s box-shadow;
+    cursor: pointer;
+    position: relative;
+}
+
+.design_card:hover{
+    box-shadow: var(--hover-shadow);
+}
+
+.design_card > img{
+    position:absolute;
+    height:50%;
+    max-height: 8em;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    opacity: 0;
+    transition: 0.1s opacity;
+}
+
+.design_card:hover > img{
+    opacity:1;
+}
+
+.design_card_grid{
+    width:100%;
+    display:grid;
+    grid-template-columns: repeat(8, 1fr);
+    overflow: hidden;
+}
+
+.design_card_grid > span{
+    position:absolute
+}
+
+.design_card_grid > div{
+    width:100%;
+    aspect-ratio: 1 /1;
+    --light-green:#AAD751;
+    --dark-green:#A2D149;
+    --light-filled:#E5C29F;
+    --dark-filled:#D7B899;
+}
+
+.design_card_grid > div:nth-child(2n){
+    background-color: var(--dark-green);
+}
+
+.design_card_grid > div:nth-child(2n+1){
+    background-color: var(--light-green);
+}
+
+.design_card_grid > .filled:nth-child(2n){
+    background-color: var(--dark-filled);
+}
+
+.design_card_grid > .filled:nth-child(2n+1){
+    background-color: var(--light-filled);
+}
+
+.design_card_bar{
+    position:absolute;
+    inset:0.5em;
+    height:max-content;
+    display:flex;
+    background-color: var(--card-clr);
+    border-radius: 0.3em;
+    line-height: 1;
+    padding:0.3em 0.5em;
+    align-items: center;
+}
+
+.design_card_bar > div{
+    flex:1;
+}
+
+.design_card_bar > img{
+    height:1.5em;
+    border-radius: 0.1em;
+}
+
+.design_card_bar > img:hover{
+    background-color: var(--accent-clr);
+}
+
 
     </style>
 </head>
@@ -226,11 +343,34 @@ function post_request(url,callback,data){
 }
 
 post_request('/',function(data){
-    console.log(data)
     data = JSON.parse(data)
     if (data['state'] == 'done'){
         for (i=0;i<data['designs'].length;i++){
-            
+            divs = ''//create 64 divs for the minefield
+            for (n=0;n<8;n++){
+                for (g=0;g<8;g++){
+                    classlist = ''
+                    for (h=0;h<data['designs'][i]['pattern'].length;h++){
+                        if (data['designs'][i]['pattern'][h][0] == g && data['designs'][i]['pattern'][h][1] == n){
+                            classlist = 'filled'
+                        }
+                    }
+                    divs += '<div class="'+classlist+'"></div>'
+                }
+                divs += '<span></span>'//create an empty span every row so the css selectors are easier
+            }
+            a = document.createElement('DIV');
+            a.setAttribute('class','design_card')
+            a.innerHTML = `
+                <div class='design_card_grid'>${divs}</div>
+                <img src='/static/ui_icons/play.svg'>
+                <div class='design_card_bar'>
+                    <div>Attempts: ${data['designs'][i]['attempts']}</div>
+                    <div>Best time: ${data['designs'][i]['time']}</div>
+                    <img src='/static/ui_icons/more_dots.svg'>
+                </div>
+            `
+            document.getElementById('design_grid').appendChild(a)
         }
     }
 },{'request_type':'get_designs','user_token':localStorage.getItem('user_token')})

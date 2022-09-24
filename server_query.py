@@ -88,13 +88,16 @@ def get_designs(user_id):
     cur = conn.cursor()
 
     sql= f'''
-        SELECT design_id FROM designs 
+        SELECT design_id,COUNT(attempts.FK_design_id),MIN(attempts.time) FROM designs 
+        LEFT JOIN attempts ON attempts.FK_design_id=design_id
         WHERE FK_user_id='{user_id}'
         ORDER BY edited_on DESC
     '''
 
     cur.execute(sql)
     result = cur.fetchall()
+
+    
 
     data = []
     for i in range(len(result)):
@@ -106,8 +109,17 @@ def get_designs(user_id):
         cur.execute(sql)
         pattern = cur.fetchall()
 
+        time = int(result[i][2])
+        mins = str(time // 60)
+        seconds = str(time % 60)
+
+        if len(seconds) == 1:
+            seconds = '0'+seconds
+
         data.append({
             'design_id':result[i][0],
+            'attempts':result[i][1],
+            'time':str(mins)+':'+str(seconds),
             'pattern':pattern
         })
 
