@@ -49,15 +49,17 @@ def create_token(user_id):
         INSERT INTO tokens
         VALUES ({user_id},'{hashed_token}','{hashed_cookie_token}')
     '''
-
+ 
     try:##if this fails it means we didnt generate a unique set of tokens
         cur.execute(sql)
-    except:##so try again
-        token, cookie_token = create_token(user_id)
-    finally:
+    except:##so try again  
         cur.close()
-        conn.commit()
         conn.close()
+        token, cookie_token = create_token(user_id)
+
+    conn.commit()
+    cur.close()   
+    conn.close()
 
     return token,cookie_token
 
@@ -97,7 +99,7 @@ def get_designs(user_id):
     cur.execute(sql)
     result = cur.fetchall()
 
-    
+
 
     data = []
     for i in range(len(result)):
