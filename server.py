@@ -1,3 +1,4 @@
+from http import server
 from flask import Flask, render_template, request, redirect,make_response, send_from_directory
 import os
 import json
@@ -19,6 +20,15 @@ def home():
             user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
             designs = server_query.get_designs(user_id)
             return json.dumps({'state':'done','designs':designs})
+        if data['request_type'] == 'get_design':
+            user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+            ##check the user owns the design
+            if server_query.get_owner_of_design(data['id']) == user_id:
+                #if the user owns it get the pattern
+                pattern = server_query.get_design(data['id'])
+                return json.dumps({'state':'done','design':pattern,'design_id':data['id']})
+            else:
+                return json.dumps({'state':'permission denied'})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

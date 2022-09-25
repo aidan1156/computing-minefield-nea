@@ -90,8 +90,7 @@ def get_designs(user_id):
     cur = conn.cursor()
 
     sql= f'''
-        SELECT design_id,COUNT(attempts.FK_design_id),MIN(attempts.time) FROM designs 
-        LEFT JOIN attempts ON attempts.FK_design_id=design_id
+        SELECT design_id FROM designs 
         WHERE FK_user_id='{user_id}'
         ORDER BY edited_on DESC
     '''
@@ -111,17 +110,28 @@ def get_designs(user_id):
         cur.execute(sql)
         pattern = cur.fetchall()
 
-        time = int(result[i][2])
-        mins = str(time // 60)
-        seconds = str(time % 60)
+        sql= f'''
+            SELECT COUNT(attempts.FK_design_id),MIN(attempts.time) FROM attempts 
+            WHERE FK_design_id='{result[i][0]}'
+        '''
 
-        if len(seconds) == 1:
-            seconds = '0'+seconds
+        cur.execute(sql)
+        stats = cur.fetchall()
+
+        if stats[0][1] == None:
+            time = ' - '
+        else:
+            time = int(stats[0][1])
+            mins = str(time // 60)
+            seconds = str(time % 60)
+            if len(seconds) == 1:
+                seconds = '0'+seconds
+            time = mins+':'+seconds
 
         data.append({
             'design_id':result[i][0],
-            'attempts':result[i][1],
-            'time':str(mins)+':'+str(seconds),
+            'attempts':stats[0][0],
+            'time':time,
             'pattern':pattern
         })
 
@@ -130,4 +140,37 @@ def get_designs(user_id):
 
     return data
     
+def get_owner_of_design(design_id):
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        SELECT FK_user_id FROM designs 
+        WHERE design_id='{design_id}'
+    '''
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return result[0][0]
+
+def get_design(design_id):
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        SELECT x,y FROM design_pattern
+        WHERE FK_design_id='{design_id}'
+    '''
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return result
     
