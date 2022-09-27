@@ -83,6 +83,8 @@ function show_options(el,id,data){
 }
 
 function edit_design(id){
+    pos = document.querySelector('.design_card[data-id="'+id+'"]').getBoundingClientRect()
+    document.getElementById('minefield_editor').style.transformOrigin = (pos.x+pos.width/2)+'px '+(pos.y+pos.height/2)+'px'
     post_request('/',function(data){
         data = JSON.parse(data)
         if (data['state'] == 'done'){
@@ -117,6 +119,8 @@ document.getElementById('minefield_editor').onmousedown = function(){
 }
 document.getElementById('minefield_editor').onmouseup = function(){
     this.dataset.click = 0;
+    this.dataset.y = 100
+    this.dataset.x = 100
 }
 els = document.querySelectorAll('#minefield_editor .design_grid > div')
 for (i=0;i<els.length;i++){
@@ -135,18 +139,18 @@ for (i=0;i<els.length;i++){
             document.getElementById('minefield_editor').dataset.selected_y = this.dataset.y
         }
     }
-    els[i].onclick = function(){
-        if (this.classList.contains('filled')){
-            this.classList.remove('filled')
-        }
-        else{
-            this.classList.add('filled')
-        }
-        document.getElementById('minefield_editor').dataset.selected_x = this.dataset.x
-        document.getElementById('minefield_editor').dataset.selected_y = this.dataset.y
-    }
+    // els[i].onclick = function(){
+    //     if (this.classList.contains('filled')){
+    //         this.classList.remove('filled')
+    //     }
+    //     else{
+    //         this.classList.add('filled')
+    //     }
+    //     document.getElementById('minefield_editor').dataset.selected_x = this.dataset.x
+    //     document.getElementById('minefield_editor').dataset.selected_y = this.dataset.y
+    // }
     els[i].onmouseover = a
-    els[i].ondragover = a
+    // els[i].ondragover = a
 }
 
 post_request('/',function(data){
