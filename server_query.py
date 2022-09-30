@@ -173,4 +173,35 @@ def get_design(design_id):
     conn.close()
 
     return result
+
+def save_design(design_id,pattern):
+    design_id = int(design_id)
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        DELETE FROM design_pattern
+        WHERE FK_design_id='{design_id}'
+    '''
+
+    cur.execute(sql)
+
+    if len(pattern) != 0:
+        values = ''
+
+        for i in range(len(pattern)):##generate the sql we convewrt from int back to string for sql cleaning
+            values += '('+str(design_id)+','+str(int(pattern[i][0]))+','+str(int(pattern[i][1]))+')'
+            if i != len(pattern) - 1:
+                values += ','
+
+        sql= f'''
+            INSERT INTO design_pattern
+            VALUES {values}
+        '''
+
+        cur.execute(sql)
+
+    cur.close()
+    conn.commit()
+    conn.close()
     

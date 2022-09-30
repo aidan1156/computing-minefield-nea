@@ -29,6 +29,16 @@ def home():
                 return json.dumps({'state':'done','design':pattern,'design_id':data['id']})
             else:
                 return json.dumps({'state':'permission denied'})
+        if data['request_type'] == 'save_design':
+            # try:
+            user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+            ##check the user owns the design
+            if server_query.get_owner_of_design(data['id']) == user_id:
+                ##if the user owns said design
+                server_query.save_design(data['id'],data['pattern'])
+                return json.dumps({'state':'done'})
+            else:
+                return json.dumps({'state':'permission denied'})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

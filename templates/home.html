@@ -50,7 +50,7 @@
 <div id='minefield_editor'>
     <div class='large_header'>
         <div>
-            <img src='/static/ui_icons/back.svg'>
+            <img src='/static/ui_icons/back.svg' onclick='save_design();document.getElementById("minefield_editor").style.display = ""'>
             <div></div>
             <img src='/static/ui_icons/reset.svg'>
             <img src='/static/ui_icons/automatic.svg'>
@@ -60,6 +60,7 @@
             Edit Design
         </div>
     </div>
+    <img src='/static/ui_icons/play.svg'>
 </div>
 
 <script>
@@ -83,6 +84,10 @@ function show_options(el,id,data){
 }
 
 function edit_design(id){
+    els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')
+    for (i=els.length-1;i>-1;i--){
+        els[i].classList.remove('filled')
+    }
     pos = document.querySelector('.design_card[data-id="'+id+'"]').getBoundingClientRect()
     document.getElementById('minefield_editor').style.transformOrigin = (pos.x+pos.width/2)+'px '+(pos.y+pos.height/2)+'px'
     post_request('/',function(data){
@@ -93,7 +98,36 @@ function edit_design(id){
             }
             document.getElementById('minefield_editor').style.display = 'flex'
         }
+        document.getElementById('minefield_editor').dataset.id = data['design_id']
     },{'request_type':'get_design','id':id,'user_token':localStorage.getItem('user_token')})
+}
+
+function save_design(){//save the current design open in the editor
+    design_id = document.getElementById('minefield_editor').dataset.id
+
+    els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')
+    pattern = []
+    for (i=0;i<els.length;i++){
+        pattern.push([els[i].dataset.x,els[i].dataset.y])
+    }
+    post_request('/',function(data){
+        data = JSON.parse(data)
+        if (data['state'] != 'done'){
+            create_bottom_alert('Failed to save design')
+        }
+        else{
+            //update the design grid with the new design
+            design_card = document.querySelector('#design_grid > .design_card[data-id="'+design_id+'"]')
+            design_id = document.getElementById('minefield_editor').dataset.id
+            els = design_card.querySelectorAll('.filled')
+            for (i=els.length-1;i>-1;i--){
+                els[i].classList.remove('filled')
+            }
+            for (i=0;i<pattern.length;i++){
+                design_card.querySelector('div[data-x="'+pattern[i][0]+'"][data-y="'+pattern[i][1]+'"]').classList.add('filled')
+            }
+        }
+    },{'request_type':'save_design','id':design_id,'pattern':pattern,'user_token':localStorage.getItem('user_token')})
 }
 
 function create_minefield_grid(pattern){
@@ -113,44 +147,48 @@ function create_minefield_grid(pattern){
     return "<div class='design_grid'>"+divs+'</div>'
 }
 
+function create_bottom_alert(text){//create a popup message
+    a = document.createElement('DIV');
+    a.setAttribute('class','bottom_alert');
+    a.innerText = text;
+    setTimeout(function(){
+        el = document.querySelector('.bottom_alert')
+        el.parentNode.removeChild(el)
+    },5000)
+    setTimeout(function(){
+        el = document.querySelector('.bottom_alert')
+        el.classList.add('fading')
+    },4000)
+    document.body.appendChild(a)
+}
+
 document.getElementById('minefield_editor').innerHTML += create_minefield_grid([])
 document.getElementById('minefield_editor').onmousedown = function(){
     this.dataset.click = 1;
 }
 document.getElementById('minefield_editor').onmouseup = function(){
     this.dataset.click = 0;
-    this.dataset.y = 100
-    this.dataset.x = 100
 }
 els = document.querySelectorAll('#minefield_editor .design_grid > div')
 for (i=0;i<els.length;i++){
-    a = function(){
-        if (!matchMedia('(pointer:fine)').matches){
-            document.getElementById('minefield_editor').dataset.click = 1
+    els[i].onclick = function(){
+        if (this.classList.contains('filled')){
+            this.classList.remove('filled')
         }
-        if (parseInt(document.getElementById('minefield_editor').dataset.click) && (document.getElementById('minefield_editor').dataset.selected_x != this.dataset.x || document.getElementById('minefield_editor').dataset.selected_y != this.dataset.y)){
+        else{
+            this.classList.add('filled')
+        }
+    }
+    els[i].onmouseenter = function(){
+        if (parseInt(document.getElementById('minefield_editor').dataset.click)){
             if (this.classList.contains('filled')){
                 this.classList.remove('filled')
             }
             else{
                 this.classList.add('filled')
             }
-            document.getElementById('minefield_editor').dataset.selected_x = this.dataset.x
-            document.getElementById('minefield_editor').dataset.selected_y = this.dataset.y
         }
     }
-    // els[i].onclick = function(){
-    //     if (this.classList.contains('filled')){
-    //         this.classList.remove('filled')
-    //     }
-    //     else{
-    //         this.classList.add('filled')
-    //     }
-    //     document.getElementById('minefield_editor').dataset.selected_x = this.dataset.x
-    //     document.getElementById('minefield_editor').dataset.selected_y = this.dataset.y
-    // }
-    els[i].onmouseover = a
-    // els[i].ondragover = a
 }
 
 post_request('/',function(data){

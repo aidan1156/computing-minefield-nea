@@ -152,6 +152,22 @@ h1{
     font-size: 1.3em;
 }
 
+.bottom_alert{
+    position:fixed;
+    left:50%;
+    bottom:0.5em;
+    background-color: var(--primary-text);
+    color:var(--secondary-clr);
+    transform: translateX(-50%);
+    max-width: 90%;
+    padding:0.5em 1em;
+    border-radius: 0.3em;
+    transition: opacity 1s;
+}
+
+.bottom_alert.fading{
+    opacity: 0;
+}
 
 /* nav bar styling */
 #top_bar{
@@ -160,6 +176,7 @@ h1{
     height:5em;
     display:flex;
     place-content: center;
+    z-index: 1;
 }
 
 #top_bar h1{
@@ -413,9 +430,21 @@ main{
     display:none;
     overscroll-behavior: contain;
     animation: zoom-in .3s, fade-in 0.3s;
+    z-index:2;
 }
 
 #minefield_editor > .design_grid{
     margin:auto;
     width:min(calc(100vh - 10em),100%);
+}
+
+#minefield_editor > img{
+    position: absolute;
+    right:1em;
+    bottom:1em;
+    background-color: var(--button-clr);
+    padding:0.5em;
+    border-radius: 0.5em;
+    height:2.5em;
+    box-shadow: var(--hover-shadow);
 }
