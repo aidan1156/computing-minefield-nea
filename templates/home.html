@@ -24,7 +24,7 @@
                 <img src="/static/ui_icons/add.svg">
                 Create new
             </div>
-            <div class='button_card'>
+            <div class='button_card' onclick='new_design(true)'>
                 <img src="/static/ui_icons/automatic.svg">
                 Auto generate
             </div>
@@ -91,6 +91,7 @@ function edit_design(id){
     pos = document.querySelector('.design_card[data-id="'+id+'"]').getBoundingClientRect()
     document.getElementById('minefield_editor').style.transformOrigin = (pos.x+pos.width/2)+'px '+(pos.y+pos.height/2)+'px'
     post_request('/',function(data){
+        console.log(data)
         data = JSON.parse(data)
         if (data['state'] == 'done'){
             for (i=0;i<data['design'].length;i++){
@@ -145,6 +146,12 @@ function create_minefield_grid(pattern){
         divs += '<span></span>'//create an empty span every row so the css selectors are easier
     }
     return "<div class='design_grid'>"+divs+'</div>'
+}
+
+function new_design(auto_generate){
+    post_request('/',function(data){
+        console.log(data)
+    },{'request_type':'new_design','auto_generate':auto_generate,'user_token':localStorage.getItem('user_token')})
 }
 
 function create_bottom_alert(text){//create a popup message
@@ -210,6 +217,9 @@ post_request('/',function(data){
             `
             document.getElementById('design_grid').appendChild(a)
         }
+    }
+    else if (data['state'] == 'signed out'){
+        window.location.pathname = '/sign-in'
     }
 },{'request_type':'get_designs','user_token':localStorage.getItem('user_token')})
 

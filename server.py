@@ -13,11 +13,15 @@ app.config['PREFERRED_URL_SCHEME'] = 'https:'
 @app.route('/',methods=['GET','POST'])
 def home():
     if request.method == 'GET':
+        if request.cookies.get('user_token') == None:
+            return redirect('/')
         return render_template('home.html')
     if request.method == 'POST':##handle requests to edit/get data
         data = json.loads(request.data)
         if data['request_type'] == 'get_designs':
             user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+            if not user_id:
+                return json.dumps({'state':'signed out'})
             designs = server_query.get_designs(user_id)
             return json.dumps({'state':'done','designs':designs})
         if data['request_type'] == 'get_design':
@@ -30,15 +34,21 @@ def home():
             else:
                 return json.dumps({'state':'permission denied'})
         if data['request_type'] == 'save_design':
-            # try:
+            try:
+                user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+                ##check the user owns the design
+                if server_query.get_owner_of_design(data['id']) == user_id:
+                    ##if the user owns said design
+                    server_query.save_design(data['id'],data['pattern'])
+                    return json.dumps({'state':'done'})
+                else:
+                    return json.dumps({'state':'permission denied'})
+            except:
+                return json.dumps({'state':'failed'})
+        if data['request_type'] == 'new_design':
             user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
-            ##check the user owns the design
-            if server_query.get_owner_of_design(data['id']) == user_id:
-                ##if the user owns said design
-                server_query.save_design(data['id'],data['pattern'])
-                return json.dumps({'state':'done'})
-            else:
-                return json.dumps({'state':'permission denied'})
+            design_id = server_query.create_new_design(user_id,data['auto_generate'])
+            return json.dumps({'state':'done'})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

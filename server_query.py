@@ -2,6 +2,9 @@ import sqlite3
 import hashlib
 import string
 import random
+import datetime
+
+import path_generation
 
 def hash_data(data):
     encoded = data.encode()
@@ -186,6 +189,14 @@ def save_design(design_id,pattern):
 
     cur.execute(sql)
 
+    sql= f'''
+        UPDATE designs
+        SET edited_on = '{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+        WHERE design_id='{design_id}'
+    '''
+
+    cur.execute(sql)
+
     if len(pattern) != 0:
         values = ''
 
@@ -205,3 +216,30 @@ def save_design(design_id,pattern):
     conn.commit()
     conn.close()
     
+def create_new_design(user_id,auto_generate):
+    ##create a new design
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        INSERT INTO designs (FK_user_id, created_on, edited_on, auto_generated)
+        VALUES ('{user_id}','{date}','{date}','{int(auto_generate)}')
+    '''
+
+    cur.execute(sql)
+
+    sql = '''SELECT last_insert_rowid();'''
+    cur.execute(sql)
+    design_id = cur.fetchall()[0][0]
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    if auto_generate:
+        pattern = path_generation.generate_path()
+        save_design(design_id,pattern)
+
+    return design_id
