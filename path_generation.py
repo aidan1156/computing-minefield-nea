@@ -27,20 +27,20 @@ def get_adjacent_weight(i,n):
         return 10
     if i == n+1 and int(n/grid_size) != n/grid_size:
         return 10
-    if i == n-grid_size:#forward
-        return 1000000
-    if i == n+grid_size:#backward
+    if i == n-grid_size:#backwards
         return 10
+    if i == n+grid_size:#forward
+        return 1000000
 
     ##diagonals
     if get_row(i) == get_row(n)-1 and get_col(i) == get_col(n)-1:
-        return 500000000
+        return 50
     if get_row(i) == get_row(n)+1 and get_col(i) == get_col(n)+1:
-        return 50
-    if get_row(i) == get_row(n)-1 and get_col(i) == get_col(n)+1:
         return 500000000
-    if get_row(i) == get_row(n)+1 and get_col(i) == get_col(n)-1:
+    if get_row(i) == get_row(n)-1 and get_col(i) == get_col(n)+1:
         return 50
+    if get_row(i) == get_row(n)+1 and get_col(i) == get_col(n)-1:
+        return 500000000
 
     return False
 
@@ -48,32 +48,19 @@ def get_adjacent_weight(i,n):
 def get_row(i):
     val = math.ceil(i / grid_size)
     if val == 0:
-        val = 9
-    if val == 10:
-        val = 9
+        val = grid_size
+    if val == grid_size+1:
+        val = grid_size
     return val
 
 ##get the column a node belongs to
 def get_col(i):
     val = i % grid_size
     if val == 0:
-        val = 9
+        val = grid_size
     return val
 
-def generate_path():
-    graph = []
-
-    for i in range(grid_size*grid_size):
-        graph.append(node(i))
-
-    for i in range(len(graph)):
-        for n in range(len(graph)):
-            if bool(get_adjacent_weight(n+1,i+1)):
-                graph[i].add_connection(graph[n],random.randint(get_adjacent_weight(n+1,i+1) // 10,get_adjacent_weight(n+1,i+1)))
-
-    start = graph[random.randint(0,grid_size-1)]
-    end = graph[random.randint(grid_size*(grid_size-1),grid_size*grid_size-1)]
-
+def apply_djikstras_algorithm(graph,start,end):
     current_node = start
     current_node.final_value = 0
 
@@ -101,8 +88,6 @@ def generate_path():
             if graph[i].final_value == None:
                 assigned_final_values = False
 
-    print(graph[5].final_value)
-
     ##find the path
     current_node = end
     path = [current_node.name]
@@ -118,10 +103,56 @@ def generate_path():
         if current_node == start:
             done = True
 
-    print(path)
+    return path
+def generate_path():
+    print('fg')
+    graph = []
+
+    for i in range(grid_size*grid_size):
+        graph.append(node(i+1))
+
+    for i in range(len(graph)):
+        for n in range(len(graph)):
+            if bool(get_adjacent_weight(i+1,n+1)):
+                graph[i].add_connection(graph[n],random.randint(get_adjacent_weight(graph[i].name,graph[n].name) // 10,get_adjacent_weight(graph[i].name,graph[n].name)))
+
+    start = random.randint(0,grid_size-1)
+    end = random.randint(grid_size*(grid_size-1),grid_size*grid_size-1)
+
+    path = apply_djikstras_algorithm(graph,graph[start],graph[end])
+
+    graph = []
+    for i in range(len(path)):
+        graph.append(node(path[i]))
+    for i in range(len(graph)):
+        for n in range(len(graph)):
+            if bool(get_adjacent_weight(int(graph[i].name),int(graph[n].name))):
+                graph[i].add_connection(graph[n],1)
+    
+    for i in range(len(graph)):
+        if graph[i].name == start+1:
+            start_node = graph[i]
+        if graph[i].name == end+1:
+            end_node = graph[i]
+
+    path = apply_djikstras_algorithm(graph,start_node,end_node)
 
     pattern = []
     for i in range(len(path)):
         pattern.append([get_col(path[i])-1,get_row(path[i])-1])
+
+    
+    ##check if there is variation in the path
+    regenerate = False
+    for i in range(2,len(pattern)):
+        if pattern[i][0] == pattern[i-1][0] == pattern[i-2][0]:
+            regenerate = True
+
+    if regenerate:
+        pattern = generate_path()
+
+    # if len(pattern) < grid_size+3:
+    #     pattern = generate_path()
+
 
     return pattern
