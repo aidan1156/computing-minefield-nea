@@ -131,6 +131,30 @@ function save_design(){//save the current design open in the editor
     },{'request_type':'save_design','id':design_id,'pattern':pattern,'user_token':localStorage.getItem('user_token')})
 }
 
+function new_design(auto_generate){
+    post_request('/',function(data){
+        console.log(data)
+        data = JSON.parse(data)
+        if (data['state'] == 'done'){
+            a = document.createElement('DIV');
+            a.setAttribute('class','design_card');
+            a.setAttribute('data-id',data['design_id'])
+            grid = create_minefield_grid([])
+            a.innerHTML = `
+                ${grid}
+                <img src='/static/ui_icons/play.svg'>
+                <div class='design_card_bar'>
+                    <div>Attempts: 0</div>
+                    <div>Best time: -</div>
+                    <img src='/static/ui_icons/more_dots.svg' onclick=\"show_options(this,'minefield_card_options',this.parentNode.parentNode.dataset.id)\">
+                </div>
+            `
+            document.getElementById('design_grid').innerHTML = a.outerHTML + document.getElementById('design_grid').innerHTML//add the new design at the top of the list
+            edit_design(data['design_id'])
+        }
+    },{'request_type':'new_design','auto_generate':auto_generate,'user_token':localStorage.getItem('user_token')})
+}
+
 function create_minefield_grid(pattern){
     divs = ''//create 64 divs for the minefield
     for (n=0;n<8;n++){
@@ -146,12 +170,6 @@ function create_minefield_grid(pattern){
         divs += '<span></span>'//create an empty span every row so the css selectors are easier
     }
     return "<div class='design_grid'>"+divs+'</div>'
-}
-
-function new_design(auto_generate){
-    post_request('/',function(data){
-        console.log(data)
-    },{'request_type':'new_design','auto_generate':auto_generate,'user_token':localStorage.getItem('user_token')})
 }
 
 function create_bottom_alert(text){//create a popup message

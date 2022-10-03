@@ -48,7 +48,7 @@ def home():
         if data['request_type'] == 'new_design':
             user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
             design_id = server_query.create_new_design(user_id,data['auto_generate'])
-            return json.dumps({'state':'done'})
+            return json.dumps({'state':'done','design_id':design_id})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

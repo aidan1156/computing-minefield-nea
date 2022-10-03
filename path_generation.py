@@ -105,7 +105,6 @@ def apply_djikstras_algorithm(graph,start,end):
 
     return path
 def generate_path():
-    print('fg')
     graph = []
 
     for i in range(grid_size*grid_size):
