@@ -14,7 +14,7 @@ app.config['PREFERRED_URL_SCHEME'] = 'https:'
 def home():
     if request.method == 'GET':
         if request.cookies.get('user_token') == None:
-            return redirect('/')
+            return redirect('/sign-in')
         return render_template('home.html')
     if request.method == 'POST':##handle requests to edit/get data
         data = json.loads(request.data)
