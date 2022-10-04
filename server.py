@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect,make_response, send_
 import os
 import json
 import server_query
+import path_generation
 
 main_dir = os.path.dirname(os.path.realpath(__file__))#path to the server (paths referenced in the code are relative to this)
 
@@ -49,6 +50,9 @@ def home():
             user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
             design_id = server_query.create_new_design(user_id,data['auto_generate'])
             return json.dumps({'state':'done','design_id':design_id})
+        if data['request_type'] == 'auto_gen_design':
+            pattern = path_generation.generate_path()
+            return json.dumps({'state':'done','pattern':pattern})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

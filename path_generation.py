@@ -34,11 +34,11 @@ def get_adjacent_weight(i,n):
 
     ##diagonals
     if get_row(i) == get_row(n)-1 and get_col(i) == get_col(n)-1:
-        return 50
+        return 500
     if get_row(i) == get_row(n)+1 and get_col(i) == get_col(n)+1:
         return 500000000
     if get_row(i) == get_row(n)-1 and get_col(i) == get_col(n)+1:
-        return 50
+        return 500
     if get_row(i) == get_row(n)+1 and get_col(i) == get_col(n)-1:
         return 500000000
 
@@ -61,6 +61,10 @@ def get_col(i):
     return val
 
 def apply_djikstras_algorithm(graph,start,end):
+    for i in range(len(graph)):
+        graph[i].working_value = None
+        graph[i].final_value = None
+
     current_node = start
     current_node.final_value = 0
 

@@ -20,7 +20,7 @@
     </div>
     <main>
         <div id="new_design_buttons">
-            <div class='button_card'>
+            <div class='button_card' onclick='new_design(false)'>
                 <img src="/static/ui_icons/add.svg">
                 Create new
             </div>
@@ -47,13 +47,14 @@
     </div>
 </div>
 
+<!-- minefield editor -->
 <div id='minefield_editor'>
     <div class='large_header'>
         <div>
             <img src='/static/ui_icons/back.svg' onclick='save_design();document.getElementById("minefield_editor").style.display = ""'>
             <div></div>
-            <img src='/static/ui_icons/reset.svg'>
-            <img src='/static/ui_icons/automatic.svg'>
+            <img src='/static/ui_icons/reset.svg' onclick='clear_design()'>
+            <img src='/static/ui_icons/automatic.svg' onclick='auto_gen_design()'>
             <img src='/static/ui_icons/play.svg'>
         </div>
         <div>
@@ -70,17 +71,24 @@ function post_request(url,callback,data){
         'body':JSON.stringify(data)
     }).then((data) => {
         data.text().then((text) => {callback(text)})
+    }).catch(() => {
+        create_bottom_alert('Failed to fetch data, please check your internet')
     })
 }
 
-function show_options(el,id,data){
-    window.event.stopPropagation()
-    pos = el.getBoundingClientRect();
-    menu = document.getElementById(id);
-    menu.style.left = pos.right+'px'
-    menu.style.top = 'calc('+pos.bottom+'px + 0.5em + '+window.scrollY+'px)'
-    menu.style.display = 'block'
-    menu.dataset.data = data
+function create_bottom_alert(text){//create a popup message
+    a = document.createElement('DIV');
+    a.setAttribute('class','bottom_alert');
+    a.innerText = text;
+    setTimeout(function(){
+        el = document.querySelector('.bottom_alert')
+        el.parentNode.removeChild(el)
+    },5000)
+    setTimeout(function(){
+        el = document.querySelector('.bottom_alert')
+        el.classList.add('fading')
+    },4000)
+    document.body.appendChild(a)
 }
 
 function edit_design(id){
@@ -91,7 +99,6 @@ function edit_design(id){
     pos = document.querySelector('.design_card[data-id="'+id+'"]').getBoundingClientRect()
     document.getElementById('minefield_editor').style.transformOrigin = (pos.x+pos.width/2)+'px '+(pos.y+pos.height/2)+'px'
     post_request('/',function(data){
-        console.log(data)
         data = JSON.parse(data)
         if (data['state'] == 'done'){
             for (i=0;i<data['design'].length;i++){
@@ -133,7 +140,6 @@ function save_design(){//save the current design open in the editor
 
 function new_design(auto_generate){
     post_request('/',function(data){
-        console.log(data)
         data = JSON.parse(data)
         if (data['state'] == 'done'){
             a = document.createElement('DIV');
@@ -155,6 +161,31 @@ function new_design(auto_generate){
     },{'request_type':'new_design','auto_generate':auto_generate,'user_token':localStorage.getItem('user_token')})
 }
 
+//clear the editor
+function clear_design(){
+    els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')
+    for (i=els.length-1;i>-1;i--){
+        els[i].classList.remove('filled')
+    }
+}
+
+function auto_gen_design(){
+    post_request('/',function(data){
+        data = JSON.parse(data)
+        if (data['state'] == 'done'){
+            //clear the grid
+            els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')
+            for (i=els.length-1;i>-1;i--){
+                els[i].classList.remove('filled')
+            }
+            //add the classes to the filled squares
+            for (i=0;i<data['pattern'].length;i++){
+                document.querySelector('#minefield_editor div[data-x="'+data['pattern'][i][0]+'"][data-y="'+data['pattern'][i][1]+'"]').classList.add('filled')
+            }
+        }
+    },{'request_type':'auto_gen_design','user_token':localStorage.getItem('user_token')})
+}
+
 function create_minefield_grid(pattern){
     divs = ''//create 64 divs for the minefield
     for (n=0;n<8;n++){
@@ -170,21 +201,6 @@ function create_minefield_grid(pattern){
         divs += '<span></span>'//create an empty span every row so the css selectors are easier
     }
     return "<div class='design_grid'>"+divs+'</div>'
-}
-
-function create_bottom_alert(text){//create a popup message
-    a = document.createElement('DIV');
-    a.setAttribute('class','bottom_alert');
-    a.innerText = text;
-    setTimeout(function(){
-        el = document.querySelector('.bottom_alert')
-        el.parentNode.removeChild(el)
-    },5000)
-    setTimeout(function(){
-        el = document.querySelector('.bottom_alert')
-        el.classList.add('fading')
-    },4000)
-    document.body.appendChild(a)
 }
 
 document.getElementById('minefield_editor').innerHTML += create_minefield_grid([])
@@ -241,6 +257,16 @@ post_request('/',function(data){
     }
 },{'request_type':'get_designs','user_token':localStorage.getItem('user_token')})
 
+
+function show_options(el,id,data){
+    window.event.stopPropagation()
+    pos = el.getBoundingClientRect();
+    menu = document.getElementById(id);
+    menu.style.left = pos.right+'px'
+    menu.style.top = 'calc('+pos.bottom+'px + 0.5em + '+window.scrollY+'px)'
+    menu.style.display = 'block'
+    menu.dataset.data = data
+}
 
 document.addEventListener('click',function(){
     els = document.getElementsByClassName('options_menu')

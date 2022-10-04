@@ -142,6 +142,12 @@ h1{
 .large_header > div:nth-child(1) > img{
     height:2em;
     cursor: pointer;
+    padding:0.2em;
+    border-radius: 0.3em;
+}
+
+.large_header > div:nth-child(1) > img:hover{
+    background-color: var(--hover-clr);
 }
 
 .large_header > div:nth-child(1) > div{
@@ -167,6 +173,15 @@ h1{
 
 .bottom_alert.fading{
     opacity: 0;
+}
+
+@media (max-width:700px){
+    .bottom_alert{
+        transform: translateX(0%);
+        left:0.5em;
+        right:0.5em;
+        max-width: none;
+    }
 }
 
 /* nav bar styling */
@@ -439,7 +454,8 @@ main{
 }
 
 #minefield_editor > img{
-    position: absolute;
+    position: fixed;
+    cursor: pointer;
     right:1em;
     bottom:1em;
     background-color: var(--button-clr);
