@@ -186,7 +186,7 @@ h1{
 
 /* nav bar styling */
 #top_bar{
-    position:fixed;
+    position:relative;
     inset:0;
     height:5em;
     display:flex;
@@ -257,9 +257,6 @@ h1{
 }
 
 @media (max-width:700px){
-    #top_bar{
-        position:relative;
-    }
     #top_bar > h1{
         display:none;
     }
@@ -292,7 +289,6 @@ h1{
 /* main styling */
 
 main{
-    margin-top:5em;
     padding:1em;
 }
 
