@@ -243,3 +243,25 @@ def create_new_design(user_id,auto_generate):
         save_design(design_id,pattern)
 
     return design_id
+
+def delete_design(design_id):
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        DELETE FROM design_pattern
+        WHERE FK_design_id = '{int(design_id)}'
+    '''
+
+    cur.execute(sql)
+
+    sql= f'''
+        DELETE FROM designs
+        WHERE design_id = '{int(design_id)}'
+    '''
+
+    cur.execute(sql)
+
+    cur.close()
+    conn.commit()
+    conn.close()

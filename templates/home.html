@@ -42,7 +42,7 @@
     <div>
         <img src='/static/ui_icons/play.svg'>Play
     </div>
-    <div>
+    <div onclick="delete_design(this.parentNode.dataset.data)">
         <img src='/static/ui_icons/delete.svg'>Delete Design
     </div>
 </div>
@@ -184,6 +184,20 @@ function auto_gen_design(){
             }
         }
     },{'request_type':'auto_gen_design','user_token':localStorage.getItem('user_token')})
+}
+
+function delete_design(id){
+    post_request('/',function(data){
+        console.log(data)
+        data = JSON.parse(data)
+        if (data['state'] == 'done'){
+            el = document.querySelector('#design_grid .design_card[data-id="'+data['design_id']+'"]')
+            el.parentNode.removeChild(el)
+        }
+        else{
+            create_bottom_alert('Failed to delete design')
+        }
+    },{'user_token':localStorage.getItem('user_token'),'request_type':'delete_design','design_id':id})
 }
 
 function create_minefield_grid(pattern){

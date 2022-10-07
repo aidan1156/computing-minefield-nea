@@ -53,6 +53,11 @@ def home():
         if data['request_type'] == 'auto_gen_design':
             pattern = path_generation.generate_path()
             return json.dumps({'state':'done','pattern':pattern})
+        if data['request_type'] == 'delete_design':
+            user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+            if user_id == server_query.get_owner_of_design(data['design_id']):
+                server_query.delete_design(data['design_id'])
+            return json.dumps({'state':'done','design_id':data['design_id']})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():
