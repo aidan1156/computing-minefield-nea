@@ -139,7 +139,7 @@ function save_design(){//save the current design open in the editor
     },{'request_type':'save_design','id':design_id,'pattern':pattern,'user_token':localStorage.getItem('user_token')})
 }
 
-function new_design(auto_generate){
+function new_design(auto_generate){//create a new design and open it in the editor
     post_request('/',function(data){
         data = JSON.parse(data)
         if (data['state'] == 'done'){

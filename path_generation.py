@@ -19,6 +19,13 @@ class node():
 
         connection.nodes.append(self)
         connection.weights.append(weight)
+    
+    def check_connected(self,connection):
+        '''check if the inputted node is connected to this node'''
+        for i in range(len(self.nodes)):
+            if self.nodes[i] == connection:
+                return True
+        return False
 
 
 ##get the weight between 2 given nodes numbers
@@ -116,7 +123,7 @@ def generate_path():
 
     for i in range(len(graph)):
         for n in range(len(graph)):
-            if bool(get_adjacent_weight(i+1,n+1)):
+            if bool(get_adjacent_weight(i+1,n+1)) and not graph[i].check_connected(graph[n]):
                 graph[i].add_connection(graph[n],random.randint(get_adjacent_weight(graph[i].name,graph[n].name) // 10,get_adjacent_weight(graph[i].name,graph[n].name)))
 
     start = random.randint(0,grid_size-1)
