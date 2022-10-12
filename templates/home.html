@@ -92,36 +92,36 @@ function create_bottom_alert(text){//create a popup message
     document.body.appendChild(a)
 }
 
-function edit_design(id){
-    els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')
-    for (i=els.length-1;i>-1;i--){
-        els[i].classList.remove('filled')
-    }
-    pos = document.querySelector('.design_card[data-id="'+id+'"]').getBoundingClientRect()
+function edit_design(id){//load a design id into the editor
+    clear_design()//clear the editor
+    pos = document.querySelector('.design_card[data-id="'+id+'"]').getBoundingClientRect()//animate to zoom-in around the design card
     document.getElementById('minefield_editor').style.transformOrigin = (pos.x+pos.width/2)+'px '+(pos.y+pos.height/2)+'px'
-    post_request('/',function(data){
+    post_request('/',function(data){//request to the get the design
         data = JSON.parse(data)
         if (data['state'] == 'done'){
-            for (i=0;i<data['design'].length;i++){
+            for (i=0;i<data['design'].length;i++){//apply the pattern
                 document.querySelector('#minefield_editor div[data-x="'+data['design'][i][0]+'"][data-y="'+data['design'][i][1]+'"]').classList.add('filled')
             }
-            document.getElementById('minefield_editor').style.display = 'flex'
+            document.getElementById('minefield_editor').style.display = 'flex'//show the editor
+            document.getElementById('minefield_editor').dataset.id = data['design_id']//store the id for later
         }
-        document.getElementById('minefield_editor').dataset.id = data['design_id']
+        else{
+            create_bottom_alert('Failed to load design')
+        }
     },{'request_type':'get_design','id':id,'user_token':localStorage.getItem('user_token')})
 }
 
 function save_design(){//save the current design open in the editor
-    design_id = document.getElementById('minefield_editor').dataset.id
+    design_id = document.getElementById('minefield_editor').dataset.id//get the id of the design
 
-    els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')
+    els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')//query for all the filled squares
     pattern = []
     for (i=0;i<els.length;i++){
-        pattern.push([els[i].dataset.x,els[i].dataset.y])
+        pattern.push([els[i].dataset.x,els[i].dataset.y])//add the coordinates of the safe squares to pattern
     }
-    post_request('/',function(data){
+    post_request('/',function(data){//finally post this data to the server 
         data = JSON.parse(data)
-        if (data['state'] != 'done'){
+        if (data['state'] != 'done'){//if saving didnt work tell the user
             create_bottom_alert('Failed to save design')
         }
         else{

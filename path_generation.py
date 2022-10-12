@@ -115,15 +115,22 @@ def apply_djikstras_algorithm(graph,start,end):
             done = True
 
     return path
+
+def is_connected_to(node1,node2):
+    for i in range(len(node1.nodes)):
+        if node1.nodes[i].name == node2.name:
+            return True
+    return False
+
 def generate_path():
     graph = []
 
-    for i in range(grid_size*grid_size):
+    for i in range(grid_size*grid_size):##create a node for each square
         graph.append(node(i+1))
 
-    for i in range(len(graph)):
+    for i in range(len(graph)):##apply weights to each node checking if they are actually adjacent
         for n in range(len(graph)):
-            if bool(get_adjacent_weight(i+1,n+1)) and not graph[i].check_connected(graph[n]):
+            if bool(get_adjacent_weight(i+1,n+1)) and not is_connected_to(graph[n],graph[i]):##add connections to each 
                 graph[i].add_connection(graph[n],random.randint(get_adjacent_weight(graph[i].name,graph[n].name) // 10,get_adjacent_weight(graph[i].name,graph[n].name)))
 
     start = random.randint(0,grid_size-1)
@@ -160,9 +167,5 @@ def generate_path():
 
     if regenerate:
         pattern = generate_path()
-
-    # if len(pattern) < grid_size+3:
-    #     pattern = generate_path()
-
 
     return pattern

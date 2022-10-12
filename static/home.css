@@ -51,7 +51,7 @@ h1{
 
 @keyframes zoom-in{
     from{
-        transform: scale(40%);
+        transform: scale(0%) rotate(0);
     }
     to{
         transform: scale(100%);
