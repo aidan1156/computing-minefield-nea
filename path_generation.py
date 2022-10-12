@@ -118,7 +118,7 @@ def apply_djikstras_algorithm(graph,start,end):
 
 def is_connected_to(node1,node2):
     for i in range(len(node1.nodes)):
-        if node1.nodes[i].name == node2.name:
+        if node1.nodes[i] == node2:
             return True
     return False
 
@@ -130,7 +130,7 @@ def generate_path():
 
     for i in range(len(graph)):##apply weights to each node checking if they are actually adjacent
         for n in range(len(graph)):
-            if bool(get_adjacent_weight(i+1,n+1)) and not is_connected_to(graph[n],graph[i]):##add connections to each 
+            if bool(get_adjacent_weight(i+1,n+1)) and not graph[i].check_connected(graph[n]):##add connections to each 
                 graph[i].add_connection(graph[n],random.randint(get_adjacent_weight(graph[i].name,graph[n].name) // 10,get_adjacent_weight(graph[i].name,graph[n].name)))
 
     start = random.randint(0,grid_size-1)

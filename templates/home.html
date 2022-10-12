@@ -189,7 +189,6 @@ function auto_gen_design(){
 
 function delete_design(id){
     post_request('/',function(data){
-        console.log(data)
         data = JSON.parse(data)
         if (data['state'] == 'done'){
             el = document.querySelector('#design_grid .design_card[data-id="'+data['design_id']+'"]')
