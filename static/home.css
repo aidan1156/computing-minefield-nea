@@ -5,7 +5,7 @@
 }
 
 body {
-    background-color: white;
+    background-color: var(--primary-clr);
     font-size:clamp(0.9rem,1.3vw,1.1rem);
     line-height: 1.6;
     color: var(--primary-text);
@@ -15,11 +15,28 @@ body {
     -webkit-tap-highlight-color:transparent;
     --primary-text:#221C1A;
     --card-clr:#F9E9DA;
+    --primary-clr:white;
     --secondary-clr:#F9F0F0;
     --accent-clr:#FBE3B7;
     --button-clr:#FBABAD;
     --hover-shadow:0 1px 3px 0 rgb(60 64 67 / 10%), 0 4px 8px 3px rgb(60 64 67 / 5%);
     --hover-clr:rgba(0,0,0,0.1)
+}
+
+@media (prefers-color-scheme: dark) {
+    body{
+        --primary-text:#D9D9E0;
+        --card-clr:#262628;
+        --primary-clr:#1B1B1E;
+        --secondary-clr:#262628;
+        --accent-clr:#D9BFD7;
+        --button-clr:#AEC6FF;
+        --hover-shadow:0 1px 3px 0 rgb(60 64 67 / 10%), 0 4px 8px 3px rgb(60 64 67 / 5%);
+        --hover-clr:rgba(255,255,255,0.1)
+    }
+    .icon{
+        filter: brightness(100);
+    }
 }
 
 h1{
@@ -173,6 +190,23 @@ h1{
 
 .bottom_alert.fading{
     opacity: 0;
+}
+
+
+.FAB_element{
+    position: fixed;
+    cursor: pointer;
+    right:1em;
+    bottom:1em;
+    background-color: var(--button-clr);
+    padding:0.5em;
+    border-radius: 0.5em;
+    height:2.5em;
+    box-shadow: var(--hover-shadow);
+}
+
+.FAB_element > img{
+    height:100%;
 }
 
 @media (max-width:700px){
@@ -387,6 +421,15 @@ main{
     --dark-filled:#D7B899;
 }
 
+@media (prefers-color-scheme: dark){
+    .design_grid > div{
+        --light-green:#7FA639;
+        --dark-green:#78A133;
+        --light-filled:#B29475;
+        --dark-filled:#A68B70;
+    }
+}
+
 .design_grid > div:nth-child(2n){
     background-color: var(--dark-green);
 }
@@ -434,7 +477,7 @@ main{
 #minefield_editor{
     inset:0;
     position:fixed;
-    background-color: white;
+    background-color: var(--primary-clr);
     flex-direction: column;
     overflow: auto;
     height:100vh;
@@ -447,16 +490,4 @@ main{
 #minefield_editor > .design_grid{
     margin:auto;
     width:min(calc(100vh - 10em),100%);
-}
-
-#minefield_editor > img{
-    position: fixed;
-    cursor: pointer;
-    right:1em;
-    bottom:1em;
-    background-color: var(--button-clr);
-    padding:0.5em;
-    border-radius: 0.5em;
-    height:2.5em;
-    box-shadow: var(--hover-shadow);
 }

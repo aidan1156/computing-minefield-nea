@@ -14,19 +14,19 @@
         <div id='nav_wrapper'>
             <div id="search_bar">
                 <input type="text" placeholder='Search Designs'>
-                <img src='/static/ui_icons/search.svg'>
+                <img src='/static/ui_icons/search.svg' class='icon'>
             </div>
-            <img src='/static/ui_icons/account.svg'>
+            <img src='/static/ui_icons/account.svg' class='icon'>
         </div>
     </div>
     <main>
         <div id="new_design_buttons">
             <div class='button_card' onclick='new_design(false)'>
-                <img src="/static/ui_icons/add.svg">
+                <img src="/static/ui_icons/add.svg" class='icon'>
                 Create new
             </div>
             <div class='button_card' onclick='new_design(true)'>
-                <img src="/static/ui_icons/automatic.svg">
+                <img src="/static/ui_icons/automatic.svg" class='icon'>
                 Auto generate
             </div>
         </div>
@@ -38,13 +38,13 @@
 <!-- create the options menu for the minefield card -->
 <div class='options_menu' id='minefield_card_options'>
     <div onclick='edit_design(this.parentNode.dataset.data)'>
-        <img src='/static/ui_icons/edit.svg'>Edit Design
+        <img src='/static/ui_icons/edit.svg' class='icon'>Edit Design
     </div>
     <div>
-        <img src='/static/ui_icons/play.svg'>Play
+        <img src='/static/ui_icons/play.svg' class='icon'>Play
     </div>
     <div onclick="delete_design(this.parentNode.dataset.data)">
-        <img src='/static/ui_icons/delete.svg'>Delete Design
+        <img src='/static/ui_icons/delete.svg' class='icon'>Delete Design
     </div>
 </div>
 
@@ -52,17 +52,19 @@
 <div id='minefield_editor'>
     <div class='large_header'>
         <div>
-            <img src='/static/ui_icons/back.svg' onclick='save_design();document.getElementById("minefield_editor").style.display = ""'>
+            <img src='/static/ui_icons/back.svg' class='icon' onclick='save_design();document.getElementById("minefield_editor").style.display = ""'>
             <div></div>
-            <img src='/static/ui_icons/reset.svg' onclick='clear_design()'>
-            <img src='/static/ui_icons/automatic.svg' onclick='auto_gen_design()'>
-            <img src='/static/ui_icons/play.svg'>
+            <img src='/static/ui_icons/reset.svg' class='icon' onclick='clear_design()'>
+            <img src='/static/ui_icons/automatic.svg' class='icon' onclick='auto_gen_design()'>
+            <img src='/static/ui_icons/play.svg' class='icon'>
         </div>
         <div>
             Edit Design
         </div>
     </div>
-    <img src='/static/ui_icons/play.svg'>
+    <div class='FAB_element'>
+        <img src='/static/ui_icons/play.svg'>
+    </div>
 </div>
 
 <script>
@@ -153,7 +155,7 @@ function new_design(auto_generate){//create a new design and open it in the edit
                 <div class='design_card_bar'>
                     <div>Attempts: 0</div>
                     <div>Best time: -</div>
-                    <img src='/static/ui_icons/more_dots.svg' onclick=\"show_options(this,'minefield_card_options',this.parentNode.parentNode.dataset.id)\">
+                    <img src='/static/ui_icons/more_dots.svg' class='icon' onclick=\"show_options(this,'minefield_card_options',this.parentNode.parentNode.dataset.id)\">
                 </div>
             `
             document.getElementById('design_grid').innerHTML = a.outerHTML + document.getElementById('design_grid').innerHTML//add the new design at the top of the list
@@ -260,7 +262,7 @@ post_request('/',function(data){
                 <div class='design_card_bar'>
                     <div>Attempts: ${data['designs'][i]['attempts']}</div>
                     <div>Best time: ${data['designs'][i]['time']}</div>
-                    <img src='/static/ui_icons/more_dots.svg' onclick=\"show_options(this,'minefield_card_options',this.parentNode.parentNode.dataset.id)\">
+                    <img src='/static/ui_icons/more_dots.svg' class='icon' onclick=\"show_options(this,'minefield_card_options',this.parentNode.parentNode.dataset.id)\">
                 </div>
             `
             document.getElementById('design_grid').appendChild(a)
