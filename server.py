@@ -58,6 +58,11 @@ def home():
             if user_id == server_query.get_owner_of_design(data['design_id']):
                 server_query.delete_design(data['design_id'])
             return json.dumps({'state':'done','design_id':data['design_id']})
+        if data['request_type'] == 'get_leaderboard':
+            ##ensure the user is actually signed in even though we do nothing with the id
+            user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+            leaderboard = server_query.get_leaderboard()
+            return json.dumps({'state':'done','leaderboard':leaderboard})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

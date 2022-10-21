@@ -84,6 +84,13 @@ button{
     transition: 0.2s all;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
 .input > input{
     border: 1px solid var(--primary-text);
     border-radius: 0.3em;

@@ -265,3 +265,31 @@ def delete_design(design_id):
     cur.close()
     conn.commit()
     conn.close()
+
+def get_leaderboard():
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        SELECT teamname, mistakes, time_taken
+        FROM attempts
+        ORDER BY score DESC
+    '''
+
+    cur.execute(sql)
+
+    result = cur.fetchall()
+    cur.close()
+    conn.commit()
+    conn.close()
+
+    leaderboard = []
+    for i in range(len(result)):
+        time_taken = str(result[i][2]//60).rjust(2,'0')+':'+str(result[i][2] % 60).rjust(2,'0')
+        leaderboard.append({
+            'name':result[i][0],
+            'mistakes':result[i][1],
+            'time':time_taken
+        })
+
+    return leaderboard

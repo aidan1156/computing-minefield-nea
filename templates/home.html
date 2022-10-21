@@ -9,31 +9,45 @@
     <link rel="icon" href="/static/logo.png">
 </head>
 <body>
-    <div id="top_bar">
-        <h1>Minefield App</h1>
-        <div id='nav_wrapper'>
-            <div id="search_bar">
-                <input type="text" placeholder='Search Designs'>
-                <img src='/static/ui_icons/search.svg' class='icon'>
-            </div>
-            <img src='/static/ui_icons/account.svg' class='icon'>
+<div id="top_bar">
+    <h1>Minefield App</h1>
+    <div id='nav_wrapper'>
+        <div id="search_bar">
+            <input type="text" placeholder='Search Designs'>
+            <img src='/static/ui_icons/search.svg' class='icon'>
+        </div>
+        <img src='/static/ui_icons/account.svg' class='icon'>
+    </div>
+</div>
+<nav>
+    <div class="nav_option filled" onclick='navigate_to("designs_main",this)'>
+        <img src='/static/ui_icons/home.svg' class='icon'>
+        <div>Home</div>
+        <div class='nav_tooltip' id='nav_num_designs'></div>
+    </div>
+    <div class="nav_option" onclick='navigate_to("leaderboard_main",this)'>
+        <img src='/static/ui_icons/leaderboard.svg' class='icon'>
+        <div>Leaderboard</div>
+    </div>
+</nav>
+
+<main id='designs_main'>
+    <div id="new_design_buttons">
+        <div class='button_card' onclick='new_design(false)'>
+            <img src="/static/ui_icons/add.svg" class='icon'>
+            Create new
+        </div>
+        <div class='button_card' onclick='new_design(true)'>
+            <img src="/static/ui_icons/automatic.svg" class='icon'>
+            Auto generate
         </div>
     </div>
-    <main>
-        <div id="new_design_buttons">
-            <div class='button_card' onclick='new_design(false)'>
-                <img src="/static/ui_icons/add.svg" class='icon'>
-                Create new
-            </div>
-            <div class='button_card' onclick='new_design(true)'>
-                <img src="/static/ui_icons/automatic.svg" class='icon'>
-                Auto generate
-            </div>
-        </div>
-        <div id='design_grid'>
+    <div id='design_grid'>
 
-        </div>
-    </main>
+    </div>
+</main>
+<main id='leaderboard_main' class='hidden'>
+</main>
 
 <!-- create the options menu for the minefield card -->
 <div class='options_menu' id='minefield_card_options'>
@@ -145,6 +159,8 @@ function new_design(auto_generate){//create a new design and open it in the edit
     post_request('/',function(data){
         data = JSON.parse(data)
         if (data['state'] == 'done'){
+            //update the nav menu to show there are x designs
+            document.getElementById('nav_num_designs').innerText = parseInt(document.getElementById('nav_num_designs').innerText)+1
             a = document.createElement('DIV');
             a.setAttribute('class','design_card');
             a.setAttribute('data-id',data['design_id'])
@@ -193,6 +209,8 @@ function delete_design(id){
     post_request('/',function(data){
         data = JSON.parse(data)
         if (data['state'] == 'done'){
+            //update the nav menu to show there are x designs
+            document.getElementById('nav_num_designs').innerText = parseInt(document.getElementById('nav_num_designs').innerText)-1
             el = document.querySelector('#design_grid .design_card[data-id="'+data['design_id']+'"]')
             el.parentNode.removeChild(el)
         }
@@ -217,6 +235,20 @@ function create_minefield_grid(pattern){
         divs += '<span></span>'//create an empty span every row so the css selectors are easier
     }
     return "<div class='design_grid'>"+divs+'</div>'
+}
+
+//function used to change pages
+function navigate_to(page,el){
+    els = document.querySelectorAll('main')
+    for (i=0;i<els.length;i++){
+        els[i].classList.add('hidden')
+    }
+    els = document.querySelectorAll('.nav_option')
+    for (i=0;i<els.length;i++){
+        els[i].classList.remove('filled')
+    }
+    document.getElementById(page).classList.remove('hidden')
+    el.classList.add('filled')
 }
 
 document.getElementById('minefield_editor').innerHTML += create_minefield_grid([])
@@ -251,6 +283,8 @@ for (i=0;i<els.length;i++){
 post_request('/',function(data){
     data = JSON.parse(data)
     if (data['state'] == 'done'){
+        //update the nav menu to show there are x designs
+        document.getElementById('nav_num_designs').innerText = data['designs'].length
         for (i=0;i<data['designs'].length;i++){
             a = document.createElement('DIV');
             a.setAttribute('class','design_card');
@@ -272,6 +306,41 @@ post_request('/',function(data){
         window.location.pathname = '/sign-in'
     }
 },{'request_type':'get_designs','user_token':localStorage.getItem('user_token')})
+
+//get the current leaderboard
+post_request('/',function(data){
+    data = JSON.parse(data)
+    if (data['state'] == 'done'){
+        for (i=0;i<data['leaderboard'].length;i++){
+            a = document.createElement('DIV');
+            a.setAttribute('class','leaderboard_result')
+            if (i == 0){
+                a.classList.add('first')
+            }
+            image = ''
+            if (i == 0){
+                image =  "<img src='/static/ui_icons/first.png'>"
+            }
+            if (i == 1){
+                image =  "<img src='/static/ui_icons/second.png'>"
+            }
+            if (i == 2){
+                image =  "<img src='/static/ui_icons/third.png'>"
+            }
+            a.innerHTML = `
+                ${image}
+                <div class='leaderboard_place'>#${i+1}</div>
+                <div class='leaderboard_name'>${data['leaderboard'][i]['name']}</div>
+                <div class='leaderboard_time'>Time elapsed: ${data['leaderboard'][i]['time']}</div>
+                <div class='leaderboard_mistakes'>Mistakes: ${data['leaderboard'][i]['mistakes']}</div>
+            `
+            document.getElementById('leaderboard_main').appendChild(a)
+        }
+    }
+    else{
+        create_bottom_alert('Failed to get leaderboard')
+    }
+},{'request_type':'get_leaderboard','user_token':localStorage.getItem('user_token')})
 
 
 function show_options(el,id,data){
