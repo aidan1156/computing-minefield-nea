@@ -548,6 +548,13 @@ main.hidden{
     --dark-filled:#D7B899;
 }
 
+body.dark .design_grid > div{
+    --light-green:#7FA639;
+    --dark-green:#78A133;
+    --light-filled:#B29475;
+    --dark-filled:#A68B70;
+}
+
 @media (prefers-color-scheme: dark){
     .design_grid > div{
         --light-green:#7FA639;
@@ -624,7 +631,7 @@ main.hidden{
 .leaderboard_result{
     display:grid;
     position:relative;
-    grid-template-columns: max-content 2em auto;
+    grid-template-columns: max-content 3em auto;
     grid-template-areas: 'image position name'
                             'image time time'
                             'image mistakes mistakes';
@@ -673,7 +680,7 @@ main.hidden{
     grid-area: mistakes;
 } 
 
-@media (max-width:700px){
+@media (max-width:500px){
     .leaderboard_result > img{
         height:2em;
     }

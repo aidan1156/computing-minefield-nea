@@ -271,9 +271,10 @@ def get_leaderboard():
     cur = conn.cursor()
 
     sql= f'''
-        SELECT teamname, mistakes, time_taken
+        SELECT teamname, mistakes, time
         FROM attempts
         ORDER BY score DESC
+        LIMIT 30
     '''
 
     cur.execute(sql)

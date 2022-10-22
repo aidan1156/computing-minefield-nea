@@ -119,7 +119,7 @@ input:-webkit-autofill:active{
     margin-top:1em;
 }
 
-    </style>
+</style>
 </head>
 <body>
     <main>
@@ -144,10 +144,12 @@ input:-webkit-autofill:active{
 
 function sign_in(){
     //send a request to the server authenticating the user
+
+    //get the password and username
     password = document.querySelector('#password').value
     username = document.querySelector('#username').value
 
-    if (username && password){
+    if (username && password){//if they are not empty
         document.getElementById('error_message').innerText = ''
         fetch('/sign-in',{
             method:'POST',
@@ -158,21 +160,21 @@ function sign_in(){
         }).then((data) => {
             data.text().then((data) => {
                 data = JSON.parse(data)
-                if (data['state'] == 'done'){
+                if (data['state'] == 'done'){//if it was a success set up the localstorage token
                     localStorage.setItem('user_token',data['user_token'])
-                    window.location.pathname = '/'
+                    window.location.pathname = '/'//redirect the user to the homepage
                 }
                 else{
                     document.getElementById('error_message').innerText = data['state']//log the error to the user
                 }
             })
         }).catch(
-            function(){
+            function(){//give the user an error message if the request completely fails
                 document.getElementById('error_message').innerText = 'Unable to access server'
             }
         )
     }
-    else{
+    else{//if not tell the user to enter a username and password
         document.getElementById('error_message').innerText = 'Please enter your username and password'
     }
 }
