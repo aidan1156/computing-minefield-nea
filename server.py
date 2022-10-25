@@ -63,6 +63,13 @@ def home():
             user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
             leaderboard = server_query.get_leaderboard()
             return json.dumps({'state':'done','leaderboard':leaderboard})
+        if data['request_type'] == 'sign_out':
+            try:
+                user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+                server_query.sign_out(user_id)
+                return json.dumps({'state':'done'})
+            except:
+                return json.dumps({'state':'failed'})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():

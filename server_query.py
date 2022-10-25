@@ -294,3 +294,19 @@ def get_leaderboard():
         })
 
     return leaderboard
+
+def sign_out(user_id):
+    user_id = int(user_id)
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        DELETE FROM tokens
+        WHERE FK_user_id='{user_id}'
+    '''
+
+    cur.execute(sql)
+
+    cur.close()
+    conn.commit()
+    conn.close()

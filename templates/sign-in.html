@@ -13,7 +13,7 @@
 }
 
 body {
-    background-color: white;
+    background-color: var(--primary-clr);
     font-size:clamp(0.9rem,1.2vw,1.1rem);
     line-height: 1.6;
     color: var(--primary-text);
@@ -26,15 +26,34 @@ body {
     --secondary-clr:#F9F0F0;
     --accent-clr:#FBE3B7;
     --button-clr:#FBABAD;
-
+    --primary-clr:white;
     display:flex;
     min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+    body{
+        --primary-text:#D9D9E0;
+        --card-clr:#262628;
+        --primary-clr:#1B1B1E;
+        --secondary-clr:#262628;
+        --accent-clr:#D9BFD7;
+        --button-clr:#AEC6FF;
+    }
+}
+
+body.dark{
+    --primary-text:#D9D9E0;
+    --card-clr:#262628;
+    --primary-clr:#1B1B1E;
+    --secondary-clr:#262628;
+    --accent-clr:#D9BFD7;
+    --button-clr:#AEC6FF;
 }
 
 main{
     width:15em;
     margin:auto;
-    background-color: white;
     padding:2em;
     border-radius: 0.5em;
 }
@@ -76,7 +95,7 @@ button{
     top:0;
     padding:0.5em;
     padding-bottom: 0;
-    background-color: white;
+    background-color: var(--primary-clr);
     transform: translateY(-50%);
     pointer-events: none;
     font-size: 0.9em;
@@ -88,7 +107,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active{
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-box-shadow: 0 0 0 30px var(--primary-clr) inset !important;
+    -webkit-color:var(--primary-text)!important;
 }
 
 .input > input{
@@ -100,6 +120,8 @@ input:-webkit-autofill:active{
     font-family: inherit;
     font-size: inherit;
     box-sizing: border-box;
+    color:var(--primary-text);
+    background-color: var(--primary-clr);
 }
 
 .input > input:focus{
@@ -186,6 +208,10 @@ document.body.addEventListener('keydown',function(evt){
         sign_in()
     }
 });
+
+if (localStorage.getItem('theme') == 'dark'){
+    document.body.classList.add('dark')
+}
 
 </script>
 </body>
