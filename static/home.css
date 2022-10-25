@@ -553,6 +553,7 @@ body.dark #account_popup{
     border-radius: 0.5em;
     position: relative;
     height:8em;
+    cursor: pointer;
 }
 
 @supports (aspect-ratio: 16 / 9){
