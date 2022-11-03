@@ -67,7 +67,9 @@ def home():
             try:
                 user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
                 server_query.sign_out(user_id)
-                return json.dumps({'state':'done'})
+                resp = make_response(json.dumps({'state':'done'}))
+                resp.set_cookie('user_token', '', expires=0)##remove the user token cookie
+                return resp
             except:
                 return json.dumps({'state':'failed'})
 
