@@ -1,4 +1,3 @@
-from http import server
 from flask import Flask, render_template, request, redirect,make_response, send_from_directory
 import os
 import json
@@ -87,6 +86,13 @@ def sign_in():
             return resp
         else:
             return json.dumps({'state':'Incorrect password or username'})
+    
+@app.route('/sw.js')#return the service worker needed for the 'app'
+def serviceworker():
+    response=make_response(send_from_directory('static','sw.js'))
+    #change the content header file. Can also omit; flask will handle correctly.
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True,port=5003)

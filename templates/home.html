@@ -7,6 +7,17 @@
     <title>Minefield App</title>
     <link rel="stylesheet" href="/static/home.css">
     <link rel="icon" href="/static/logo.png">
+    <link rel='manifest' href='/static/manifest.webmanifest'>
+    <meta name="theme-color" content="#ffffff"/>
+    <script>
+        window.onload = function() {
+            if ('serviceWorker' in navigator){
+                navigator.serviceWorker.register('/sw.js').then(function(registration){
+                    registration.update();
+                })
+            }
+        }
+    </script>
 </head>
 <body>
 <div id="top_bar">
@@ -393,18 +404,27 @@ function select_theme(theme,el){
     //update the ui
     document.querySelector('#appearance_options .selected').classList.remove('selected')
     el.classList.add('selected')
+    metaThemeColor = document.querySelector("meta[name=theme-color]");//update the theme color
 
     if (theme == 'system'){
         document.body.classList.remove('dark')
         document.body.classList.remove('light')
+        if (window.matchMedia('(preferes-color-scheme:dark)').matches){
+            metaThemeColor.setAttribute("content", '#1B1B1E');
+        }
+        else{
+            metaThemeColor.setAttribute("content", '#ffffff');
+        }
     }
     if (theme == 'light'){
         document.body.classList.remove('dark')
         document.body.classList.add('light')
+        metaThemeColor.setAttribute("content", '#ffffff');
     }
     if (theme == 'dark'){
         document.body.classList.add('dark')
         document.body.classList.remove('light')
+        metaThemeColor.setAttribute("content", '#1B1B1E');
     }
     localStorage.theme = theme
 }

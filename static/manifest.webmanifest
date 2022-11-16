@@ -1,0 +1,36 @@
+{
+    "short_name": "Minefield App",
+    "name": "Minefield App",
+    "icons": [
+      {
+        "src": "/static/logo-192.png",
+        "type": "image/png",
+        "sizes": "192x192",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/static/logo.png",
+        "type": "image/png",
+        "sizes": "512x512",
+        "purpose": "any maskable"
+      }
+    ],
+    "categories":[
+        "games",
+        "entertainment",
+        "utilities"
+    ],
+    "id": "/?source=pwa",
+    "start_url": "/?source=pwa",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#ffffff",
+    "description": "Create and play minefield designs easily in a simple editor and each attempt is saved to a leaderboard.",
+    "handle_links": "preferred",
+    "screenshots":[
+        {"src": "/static/screenshots/Picture1.png","type": "image/webp","sizes": "540x1080"},
+        {"src": "/static/screenshots/Picture2.png","type": "image/webp","sizes": "540x1080"}
+    ],
+    "display_override": ["window-controls-overlay"]
+  }

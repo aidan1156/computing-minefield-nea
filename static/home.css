@@ -133,6 +133,7 @@ button{
     min-width: 12em;
     transform: translateX(-100%);
     padding:0.5em 0;
+    z-index:1;
 }
 
 .options_menu > div{
@@ -442,6 +443,9 @@ nav{
     #top_bar{
         position:relative;
     }
+    #top_bar input{
+        font-size:1.2em;
+    }
     #top_bar > h1{
         display:none;
     }
@@ -676,7 +680,7 @@ main.hidden{
     }
 }
 
-@media (max-width:1300px){
+@media (max-width:1400px){
     #design_grid{
         grid-template-columns: repeat(3, 1fr);
     }
