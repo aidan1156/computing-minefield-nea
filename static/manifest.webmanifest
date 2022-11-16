@@ -9,7 +9,7 @@
         "purpose": "any maskable"
       },
       {
-        "src": "/static/logo.png",
+        "src": "/static/logo-512.png",
         "type": "image/png",
         "sizes": "512x512",
         "purpose": "any maskable"
@@ -31,6 +31,5 @@
     "screenshots":[
         {"src": "/static/screenshots/Picture1.png","type": "image/webp","sizes": "540x1080"},
         {"src": "/static/screenshots/Picture2.png","type": "image/webp","sizes": "540x1080"}
-    ],
-    "display_override": ["window-controls-overlay"]
+    ]
   }
