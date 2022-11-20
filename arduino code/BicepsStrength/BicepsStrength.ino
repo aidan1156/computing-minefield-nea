@@ -1,8 +1,5 @@
 #include <Wire.h>
 #include <TimerOne.h>
-#include "QuickMedianLib.h"
-
-#define MCP4725_ADDR 0x60
 
 #define rxPin 0
 #define txPin 1

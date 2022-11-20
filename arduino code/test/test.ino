@@ -1,8 +1,10 @@
-
-#define rxPin 0
-#define txPin 1
+#include <SoftwareSerial.h>
+#define rxPin 2
+#define txPin 3
 #define ledPin 4
 #define inpin 5
+
+SoftwareSerial mySerial(rxPin, txPin); // RX, TX
 
 bool senddata = false;
 char s[50];
@@ -17,14 +19,14 @@ pinMode(rxPin, INPUT);
   pinMode(inpin, INPUT_PULLUP);
   digitalWrite(ledPin, LOW);
 
-  Serial.begin(115200); 
-  Serial.println ("Hello");
+  mySerial.begin(115200); 
+  mySerial.println ("Hello");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-   while (Serial.available()>0) {
-  command=Serial.read ();
+   while (mySerial.available()>0) {
+  command=mySerial.read ();
   if (command == 'g'){
     senddata = true;
   }
@@ -35,6 +37,6 @@ void loop() {
 //send data
 if (senddata){
 sprintf (s,"%d,%d,%d\r",digitalRead(inpin),1,3);
- Serial.println (s); 
+ mySerial.println (s); 
 }
 }
