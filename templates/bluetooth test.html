@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick='connect()'>connect</button>
+
+<script>
+var minefield_device;
+var minefield_buffer = '';
+var ggg
+
+function connect(){
+    navigator.bluetooth.requestDevice({ acceptAllDevices: true,optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb'] })
+            .then(device => {
+                // create_message('Connecting to device...')
+                // Human-readable name of the device.
+                //  console.log(device.name);
+            
+                // Attempts to connect to remote GATT Server.
+                return device.gatt.connect();
+            })
+            .then(server => {
+                // Getting Battery Service…
+                return server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+            })
+            .then(service => {
+                // Getting Battery Level Characteristic…
+                return service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+            })
+            .then(characteristic => {
+                minefield_device = characteristic;
+                // Set up event listener for when characteristic value changes.
+                characteristic.startNotifications();
+                characteristic.addEventListener('characteristicvaluechanged', handle_update);
+
+                return 'done'
+            })
+            .catch(error => { console.error(error); });
+}
+
+function write(command){
+    let cmd = [];
+    for (let i=0;i<command.length;i++){
+        cmd.push(command[i].charCodeAt(0))
+    }
+    cmd.push(10)
+    
+    let resetEnergyExpended = new Uint8Array(cmd);
+    return minefield_device.writeValue(resetEnergyExpended)
+    .then(_ => {
+        //console.log('Energy expended has been reset.');
+    })
+    .catch(error => { console.error(error); }); 
+}
+
+    
+function handle_update(event) {
+    let stop = false;
+    let i = 0;
+    while (stop == false){
+        try{
+            if (String.fromCharCode(event.target.value.getUint8(i)) == '\r' && minefield_buffer != ''){
+                console.log(JSON.stringify(minefield_buffer));
+                minefield_buffer = ''
+                i += 2;
+            }
+            else{
+                minefield_buffer += String.fromCharCode(event.target.value.getUint8(i));
+            }
+            i += 1;
+        }
+        catch{
+            stop = true;
+        }
+    }    
+    //console.log('Battery percentage is ' + batteryLevel);
+}
+
+</script>
+</body>
+</html>

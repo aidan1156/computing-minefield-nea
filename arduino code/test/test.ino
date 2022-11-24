@@ -24,19 +24,20 @@ pinMode(rxPin, INPUT);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-   while (mySerial.available()>0) {
-  command=mySerial.read ();
-  if (command == 'g'){
-    senddata = true;
+    // put your main code here, to run repeatedly:
+  while (mySerial.available()>0) {
+      command=mySerial.read ();
+      if (command == 'g'){
+        senddata = true;
+      }
+      if (command == 's'){
+        senddata = false;
+      }
   }
-  if (command == 's'){
-    senddata = false;
+  //send data
+  if (senddata){
+    sprintf (s,"%d,%d,%d\r",1,1,3);
+    mySerial.println (s); 
   }
- }
-//send data
-if (senddata){
-sprintf (s,"%d,%d,%d\r",digitalRead(inpin),1,3);
- mySerial.println (s); 
-}
+  delay(700);
 }

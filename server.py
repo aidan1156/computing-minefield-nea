@@ -94,5 +94,9 @@ def serviceworker():
     response.headers['Content-Type'] = 'application/javascript'
     return response
 
+@app.route('/test')
+def test():
+    return render_template('bluetooth test.html')
+
 if __name__ == '__main__':
     app.run(debug=True,port=5003)
