@@ -6,7 +6,7 @@
 
 body {
     background-color: var(--primary-clr);
-    font-size:clamp(0.9rem,1.3vw,1.1rem);
+    font-size:clamp(1rem,1.3vw,1.1rem);
     line-height: 1.6;
     color: var(--primary-text);
     font-weight: 500;
@@ -21,7 +21,7 @@ body {
     --accent-clr:#FBE3B7;
     --button-clr:#FBABAD;
     --hover-shadow:0 1px 3px 0 rgb(60 64 67 / 10%), 0 4px 8px 3px rgb(60 64 67 / 5%);
-    --hover-clr:rgba(0,0,0,0.1)
+    --hover-clr:rgba(0,0,0,0.05)
 }
 
 @media (prefers-color-scheme: dark) {
@@ -63,7 +63,7 @@ body.light{
     --accent-clr:#FBE3B7;
     --button-clr:#FBABAD;
     --hover-shadow:0 1px 3px 0 rgb(60 64 67 / 10%), 0 4px 8px 3px rgb(60 64 67 / 5%);
-    --hover-clr:rgba(0,0,0,0.1)
+    --hover-clr:rgba(0,0,0,0.05)
 }
 
 body.light .icon{
@@ -123,6 +123,36 @@ button{
     cursor: pointer;
 }
 
+button.filled{
+    background-color: var(--card-clr);
+    border: none;
+}
+
+.filled_input{
+    font-family: inherit;
+    font-size: inherit;
+    color:inherit;
+    background-color: transparent;
+    border:none;
+    border-bottom: 2px solid var(--primary-text);
+    padding:0.5rem 0.5rem;
+    padding-top: 0.6em;
+    flex:1;
+    max-width: 16em;
+}
+
+.filled_input:focus{
+    outline: none;
+    background-color: var(--hover-clr);
+}
+
+#options_menu_background{
+    z-index:1;
+    position: absolute;
+    inset:0;
+    display:none;
+}
+
 .options_menu{
     position:absolute;
     background-color: var(--card-clr);
@@ -163,6 +193,10 @@ button{
         padding-bottom: 3em;
         animation: slide-up 0.2s, fade-in 0.2s;
     }
+    #options_menu_background{
+        background-color: rgba(0,0,0,0.3);
+        position: fixed;
+    }
 }
 
 
@@ -191,7 +225,8 @@ button{
     height:3em;
 }
 
-.large_header{
+.large_header,
+.small_header{
     background-color: var(--secondary-clr);
     padding:1em;
 }
@@ -221,6 +256,19 @@ button{
     font-size: 1.3em;
 }
 
+.small_header{
+    display:flex;
+    gap:1em;
+    height:min-content;
+    align-items: center;
+}
+
+.small_header > img{
+    height:2em;
+    cursor: pointer;
+}
+
+
 .bottom_alert{
     position:fixed;
     left:50%;
@@ -232,6 +280,7 @@ button{
     padding:0.5em 1em;
     border-radius: 0.3em;
     transition: opacity 1s;
+    z-index: 2;
 }
 
 .bottom_alert.fading{
@@ -732,6 +781,7 @@ main.hidden{
     display:grid;
     grid-template-columns: repeat(8, 1fr);
     overflow: hidden;
+    contain: layout style paint;
 }
 
 .design_grid > span{
@@ -830,6 +880,94 @@ body.light .design_grid > div{
 #minefield_editor > .design_grid{
     margin:auto;
     width:min(calc(100vh - 10em),100%);
+}
+
+
+/* play field styling */
+#minefield_play{
+    display:none;
+    grid-template-columns: 100vh auto;
+    grid-template-rows: max-content 1fr 1fr;
+    grid-template-areas: 'minefield header'
+                        'minefield time'
+                        'minefield mistakes';
+    position:fixed;
+    inset:0;
+    background-color: var(--primary-clr);
+    z-index:2;
+    overflow: auto;
+    animation: zoom-in .3s, fade-in 0.3s;
+}
+
+#minefield_play .design_grid{
+    grid-area:minefield;
+}
+
+#minefield_play .small_header{
+    grid-area: header;
+}
+
+#play_time_elapsed_wrapper{
+    grid-area: time;
+    place-self: end center;
+    text-align: center;
+    font-size: 1.6em;
+    line-height: 1.2;
+    padding-bottom: 1em;
+}
+
+#play_teamname{
+    font-size:1.2em;
+}
+
+#play_mistakes_wrapper{
+    grid-area: mistakes;
+    place-self: stretch center;
+    font-size: 1.6em;
+    width:100%;
+    display:flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    text-align: center;
+    position:relative;
+}
+
+#play_mistakes_wrapper > div{
+    flex:1;
+}
+
+#play_time_elapsed{
+    font-size: 2.4em;
+}
+
+#play_start_button{
+    display:none;
+    width:100%;
+    max-width: 20em;
+    margin: auto;
+}
+
+#play_time_elapsed_wrapper,
+#play_mistakes_wrapper{
+    padding:0.5em;
+}
+
+@media (max-width: calc(100vh + 300px)){
+    #minefield_play{
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+        grid-template-rows: max-content 1fr max-content 1fr;
+        grid-template-areas: 'header'
+                            'time'
+                            'minefield'
+                            'mistakes';
+    }
+    #play_time_elapsed_wrapper{
+        place-self: center;
+    }
+    #play_mistakes_wrapper{
+        place-self: center;
+    }
 }
 
 

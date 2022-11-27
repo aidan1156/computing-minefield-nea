@@ -12,24 +12,17 @@
 <script>
 var minefield_device;
 var minefield_buffer = '';
-var ggg
 
 function connect(){
     navigator.bluetooth.requestDevice({ acceptAllDevices: true,optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb'] })
             .then(device => {
-                // create_message('Connecting to device...')
-                // Human-readable name of the device.
-                //  console.log(device.name);
-            
                 // Attempts to connect to remote GATT Server.
                 return device.gatt.connect();
             })
             .then(server => {
-                // Getting Battery Service…
                 return server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
             })
             .then(service => {
-                // Getting Battery Level Characteristic…
                 return service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
             })
             .then(characteristic => {
@@ -38,7 +31,7 @@ function connect(){
                 characteristic.startNotifications();
                 characteristic.addEventListener('characteristicvaluechanged', handle_update);
 
-                return 'done'
+                return characteristic
             })
             .catch(error => { console.error(error); });
 }
@@ -50,12 +43,8 @@ function write(command){
     }
     cmd.push(10)
     
-    let resetEnergyExpended = new Uint8Array(cmd);
-    return minefield_device.writeValue(resetEnergyExpended)
-    .then(_ => {
-        //console.log('Energy expended has been reset.');
-    })
-    .catch(error => { console.error(error); }); 
+    let cmd_formatted = new Uint8Array(cmd);
+    return minefield_device.writeValue(cmd_formatted).catch(error => { console.error(error); }); 
 }
 
     
