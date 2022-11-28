@@ -349,7 +349,7 @@ function start_playing_design(){
 //bluetooth functions
 function connect_device(){
     if ('bluetooth' in navigator){
-        return navigator.bluetooth.requestDevice({ filters: [{ name: "Minefield" }] })
+        return navigator.bluetooth.requestDevice({ filters: [{ name: "Minefield" }],optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb'] } )
                 .then(device => {
                     // Attempts to connect to remote GATT Server.
                     create_bottom_alert('Connecting to minefield')
