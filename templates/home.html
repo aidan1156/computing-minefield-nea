@@ -83,13 +83,13 @@
             <div></div>
             <img src='/static/ui_icons/reset.svg' class='icon' onclick='clear_design()'>
             <img src='/static/ui_icons/automatic.svg' class='icon' onclick='auto_gen_design()'>
-            <img src='/static/ui_icons/play.svg' class='icon'>
+            <img src='/static/ui_icons/play.svg' class='icon' onclick='play_design(document.getElementById("minefield_editor").dataset.id)'>
         </div>
         <div>
             Edit Design
         </div>
     </div>
-    <div class='FAB_element'>
+    <div class='FAB_element' onclick='play_design(document.getElementById("minefield_editor").dataset.id)'>
         <img src='/static/ui_icons/play.svg'>
     </div>
 </div>
