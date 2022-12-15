@@ -886,11 +886,11 @@ body.light .design_grid > div{
 /* play field styling */
 #minefield_play{
     display:none;
-    grid-template-columns: 100vh auto;
+    grid-template-columns: auto 100vh;
     grid-template-rows: max-content 1fr 1fr;
-    grid-template-areas: 'minefield header'
-                        'minefield time'
-                        'minefield mistakes';
+    grid-template-areas: 'header minefield'
+                        'time minefield'
+                        'mistakes minefield';
     position:fixed;
     inset:0;
     background-color: var(--primary-clr);
