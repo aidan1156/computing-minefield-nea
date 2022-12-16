@@ -822,10 +822,14 @@ body.light .design_grid > div{
 
 .design_grid > div:nth-child(2n){
     background-color: var(--dark-green);
+    --minefield-green: var(--dark-green);
+    --minefield-filled: var(--dark-filled);
 }
 
 .design_grid > div:nth-child(2n+1){
     background-color: var(--light-green);
+    --minefield-green: var(--light-green);
+    --minefield-filled: var(--light-filled);
 }
 
 .design_grid > .filled:nth-child(2n){
@@ -943,7 +947,7 @@ body.light .design_grid > div{
 #play_start_button{
     display:none;
     width:100%;
-    max-width: 20em;
+    max-width: 15em;
     margin: auto;
 }
 
@@ -951,6 +955,41 @@ body.light .design_grid > div{
 #play_mistakes_wrapper{
     padding:0.5em;
 }
+
+#play_time_centiseconds{
+    font-size:0.8em;
+}
+
+#minefield_play .design_grid > div.pressed{
+    background-color: var(--minefield-filled);
+}
+
+#minefield_play .design_grid > div:not(.pressed){
+    animation: 1s minefield-fade-out;
+}
+
+#minefield_play .design_grid > div.dead{
+    background-color: #DB3236;
+    position: relative;
+}
+
+#minefield_play .design_grid > div.dead::after{
+    content:"";
+    background-color: #8E2123;
+    border-radius:50%;
+    inset:20%;
+    position: absolute;
+}
+
+@keyframes minefield-fade-out {
+    from{
+        background-color: var(--minefield-filled);
+    }
+    to{
+        background-color: var(--minefield-green);
+    }
+}
+
 
 @media (max-width: calc(100vh + 300px)){
     #minefield_play{

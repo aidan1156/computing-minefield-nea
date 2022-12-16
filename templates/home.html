@@ -79,17 +79,17 @@
 <div id='minefield_editor'>
     <div class='large_header'>
         <div>
-            <img src='/static/ui_icons/back.svg' class='icon' onclick='save_design();document.getElementById("minefield_editor").style.display = ""'>
+            <img src='/static/ui_icons/back.svg' class='icon' onclick='save_design();'>
             <div></div>
             <img src='/static/ui_icons/reset.svg' class='icon' onclick='clear_design()'>
             <img src='/static/ui_icons/automatic.svg' class='icon' onclick='auto_gen_design()'>
-            <img src='/static/ui_icons/play.svg' class='icon' onclick='play_design(document.getElementById("minefield_editor").dataset.id)'>
+            <img src='/static/ui_icons/play.svg' class='icon' onclick='save_design();play_design(document.getElementById("minefield_editor").dataset.id)'>
         </div>
         <div>
             Edit Design
         </div>
     </div>
-    <div class='FAB_element' onclick='play_design(document.getElementById("minefield_editor").dataset.id)'>
+    <div class='FAB_element' onclick='save_design();play_design(document.getElementById("minefield_editor").dataset.id)'>
         <img src='/static/ui_icons/play.svg'>
     </div>
 </div>
@@ -102,7 +102,7 @@
     </div>
     <div id='play_time_elapsed_wrapper'>
         <div id='play_time_elapsed'>
-            <span id='play_time_minutes'>00</span>:<span id='play_time_seconds'>00</span>
+            <span id='play_time_minutes'>00</span>:<span id='play_time_seconds'>00</span> <span id='play_time_centiseconds'>00</span>
         </div>
         Time elapsed
     </div>
@@ -196,6 +196,7 @@ function edit_design(id){//load a design id into the editor
 }
 
 function save_design(){//save the current design open in the editor
+    document.getElementById("minefield_editor").style.display = ""
     design_id = document.getElementById('minefield_editor').dataset.id//get the id of the design
 
     els = document.querySelectorAll('#minefield_editor .design_grid > div.filled')//query for all the filled squares
@@ -291,13 +292,14 @@ function delete_design(id){
 
 async function play_design(id){//play the inputted design id
     //first reset the minefield
-    els = document.querySelectorAll('#minefield_play .design_grid > div.safe')
+    els = document.querySelectorAll('#minefield_play .design_grid > div')
     for (i=els.length-1;i>-1;i--){
-        els[i].classList.remove('safe')
+        els[i].setAttribute('class','')
     }
     document.querySelector('#minefield_play').dataset.id = id//store what design we are playing
     document.querySelector('#play_time_minutes').innerHTML = '00'
     document.querySelector('#play_time_seconds').innerHTML = '00'
+    document.querySelector('#play_time_centiseconds').innerHTML = '00'
     document.querySelector('#play_mistakes').innerHTML = '00'
     document.querySelector('#play_teamname').value = ''
 
@@ -341,9 +343,33 @@ function start_playing_design(){
     minefield_update_interval = setInterval(function(){//create the update interval to update the timer ui
         document.querySelector('#play_time_seconds').innerHTML = (parseInt((new Date()/1000 - document.querySelector('#minefield_play').dataset.start_time) % 60)+'').padStart(2, "0");
         document.querySelector('#play_time_minutes').innerHTML = (parseInt((new Date()/1000 - document.querySelector('#minefield_play').dataset.start_time) / 60)+'').padStart(2, "0");
-    },1000)
+        document.querySelector('#play_time_centiseconds').innerHTML = (parseInt((new Date()/10 - document.querySelector('#minefield_play').dataset.start_time*100) % 100)+'').padStart(2, "0");
+    },52)
 }
 
+function update_minefield_play(on_buttons){//take the pressed buttons and update UI and check for deaths 
+    //reset the pressed class
+    els = document.querySelectorAll('#minefield_play .design_grid > div.pressed')
+    for (i=0;i<els.length;i++){
+        els[i].classList.remove('pressed')
+    }
+
+    if (on_buttons != 'nothing'){
+        on_buttons = on_buttons.split(',');//split the comma separated values into list
+
+        for (i=0;i<on_buttons.length;i++){
+            xpos = on_buttons[i] % 8;
+            ypos = parseInt(on_buttons[i] / 8);
+            el = document.querySelector('#minefield_play .design_grid > div[data-x="'+xpos+'"][data-y="'+ypos+'"]')
+            if (el.classList.contains('safe')){
+                el.classList.add('pressed')
+            }
+            else{
+                el.classList.add('dead')
+            }
+        }
+    }
+}
 
 
 //bluetooth functions
@@ -393,7 +419,7 @@ function recieve_minefield_data(event) {
     while (stop == false){
         try{
             if (String.fromCharCode(event.target.value.getUint8(i)) == '\r' && minefield_buffer != ''){
-                console.log(JSON.stringify(minefield_buffer));
+                update_minefield_play(minefield_buffer);
                 minefield_buffer = ''
                 i += 2;
             }
