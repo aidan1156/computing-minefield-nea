@@ -3,6 +3,7 @@ import hashlib
 import string
 import random
 import datetime
+import markupsafe
 
 import path_generation
 
@@ -12,6 +13,7 @@ def hash_data(data):
     return result.hexdigest()
 
 def clean_for_sql(data):
+    data = str(markupsafe.escape(data))
     return data.replace("'","''")
 
 ##check if the given usernam matches the password in the db
