@@ -6,8 +6,8 @@
 #define ledPin 4
 #define buttonpin 5
 
-#define message_max_length 60//the max length of a message 
-#define bluetooth_tick_speed 1000//how often (in ms) we should send the currently pressed buttons
+#define message_max_length 20//the max length of a message 
+#define bluetooth_tick_speed 100//how often (in ms) we should send the currently pressed buttons
 #define button_tick_speed 50//how often we should check if the buttons are clicked
 #define input_length 8
 #define output_length 8
