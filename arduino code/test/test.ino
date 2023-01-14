@@ -6,9 +6,14 @@
 #define ledPin 4
 #define buttonpin 5
 
-#define message_max_length 30//the max length of a message 
-#define bluetooth_tick_speed 100//how often (in ms) we should send the currently pressed buttons
+#define message_max_length 60//the max length of a message 
+#define bluetooth_tick_speed 1000//how often (in ms) we should send the currently pressed buttons
 #define button_tick_speed 50//how often we should check if the buttons are clicked
+#define input_length 8
+#define output_length 8
+
+int input_pins[8] = {4,5,6,7,12,12,12,12};//pins used on the mat
+int output_pins[8] = {8,9,10,11,11,11,11,11};
 
 //setup the software serial port
 SoftwareSerial mySerial(rxPin, txPin); // RX, TX
@@ -29,13 +34,17 @@ void setup() {
     //setup the pins
     pinMode(rxPin, INPUT);
     pinMode(txPin, OUTPUT);
-    pinMode(ledPin, OUTPUT);
-    pinMode(buttonpin, INPUT_PULLUP);
+//    pinMode(ledPin, OUTPUT);
+//    pinMode(buttonpin, INPUT_PULLUP);
   
-    digitalWrite(ledPin, LOW);
+//    digitalWrite(ledPin, LOW);
+
+    for (i=0;i<8;i++){//set the outputs to inputs to prevent short circuiting
+        pinMode(input_pins[i], INPUT_PULLUP);
+    }
 
     //start the serial connections
-    mySerial.begin(115200); 
+    mySerial.begin(4800); 
     Serial.begin(9600);
 }
 
@@ -60,7 +69,7 @@ void loop() {
                 bluetooth_message[i] = 0;
             }
 
-            button_states[1] = 5;
+//            button_states[1] = 5;
 
             message_buffer_pos = 0;//reset the pos variable
             for (i=0;i<64;i++){//loop over each button
@@ -92,13 +101,51 @@ void loop() {
 
     //read the button for input changes
     if (millis()-button_tick_time > button_tick_speed){
-        if (digitalRead(buttonpin) == false){
-            button_states[0] += 1; 
-        }
-        else{
-            button_states[0] = 0;
-        }
+//        if (digitalRead(buttonpin) == false){
+//            button_states[0] += 1; 
+//        }
+//        else{
+//            button_states[0] = 0;
+//        }
         button_tick_time = millis();
+//        Serial.println("nothinsdfg");
+
+//        pinMode(output_pins[0], OUTPUT);
+//        digitalWrite(output_pins[0], HIGH);
+//        if (digitalRead(input_pins[0]) == true){
+//          button_states[0] += 1;            
+//        }
+//        else{
+//          button_states[0] = 0; 
+//        }
+        
+        for (i=0;i<output_length;i++){//loop over each output
+            for (n=0;n<output_length;n++){//set the outputs to inputs to prevent short circuiting
+                if (n != i){
+                    pinMode(output_pins[n], INPUT_PULLUP);
+                }
+                else{//except the selected output
+                    pinMode(output_pins[n], OUTPUT);
+                    digitalWrite(output_pins[n], HIGH);
+                }
+            }
+//            delay(10);
+            for (n=0;n<input_length;n++){//loop over the inputs and see if one is on
+//              if (7== input_pins[n] && output_pins[i] == 8){
+//                Serial.println(digitalRead(input_pins[n]));
+//              }
+                if (digitalRead(input_pins[n]) == true){
+//                  Serial.println(input_pins[n]);
+                    button_states[i*8+n] += 1;
+                      
+                }
+                else{
+                    button_states[i*8+n] = 0;
+                }
+            }  
+
+            digitalWrite(output_pins[i], LOW);//after we are done with it set the pin to low
+        }
     }
 
 //    delay(500);

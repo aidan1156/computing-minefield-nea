@@ -303,11 +303,11 @@ async function play_design(id){//play the inputted design id
     document.querySelector('#play_mistakes').innerHTML = '00'
     document.querySelector('#play_teamname').value = ''
 
-    if (!minefield_device){//if we arent connect to the device wait until we are connected
+    if (!minefield.minefield_device){//if we arent connect to the device wait until we are connected
         await connect_device()
     }
 
-    if (!minefield_device){//if we still arent connected to a device then that means the user declined the connect screen 
+    if (!minefield.minefield_device){//if we still arent connected to a device then that means the user declined the connect screen 
         create_bottom_alert('Please connect to the minefield to continue')
     } 
     else{
@@ -321,6 +321,10 @@ async function play_design(id){//play the inputted design id
                 }
                 //show the start button
                 document.getElementById('play_start_button').style.display = 'block'
+                //start getting data on button presses
+                minefield.states['play'] = false;
+                minefield.states['dead'] = false;
+                send_to_minefield('g')//send the start command to receive data
             }
             else{
                 create_bottom_alert('Failed to load design data')
@@ -330,17 +334,18 @@ async function play_design(id){//play the inputted design id
 }
 
 function close_play_design(){//close the play field
+    minefield.states['play'] = false;
     document.getElementById('minefield_play').style.display = ''
     send_to_minefield('s')//stop the data being sent
-    clearInterval(minefield_update_interval)
+    clearInterval(minefield.minefield_update_interval)
 }
 
 function start_playing_design(){
     //hide the start button
     document.getElementById('play_start_button').style.display = ''
-    send_to_minefield('g')//send the start command to receive data
+    minefield.states['play'] = true;
     document.querySelector('#minefield_play').dataset.start_time = new Date()/1000;//start time in seconds
-    minefield_update_interval = setInterval(function(){//create the update interval to update the timer ui
+    minefield.minefield_update_interval = setInterval(function(){//create the update interval to update the timer ui
         document.querySelector('#play_time_seconds').innerHTML = (parseInt((new Date()/1000 - document.querySelector('#minefield_play').dataset.start_time) % 60)+'').padStart(2, "0");
         document.querySelector('#play_time_minutes').innerHTML = (parseInt((new Date()/1000 - document.querySelector('#minefield_play').dataset.start_time) / 60)+'').padStart(2, "0");
         document.querySelector('#play_time_centiseconds').innerHTML = (parseInt((new Date()/10 - document.querySelector('#minefield_play').dataset.start_time*100) % 100)+'').padStart(2, "0");
@@ -355,19 +360,36 @@ function update_minefield_play(on_buttons){//take the pressed buttons and update
     }
 
     if (on_buttons != 'nothing'){
-        on_buttons = on_buttons.split(',');//split the comma separated values into list
+        if (minefield.states['dead'] == false){//freeze any board updates until they arent pressing anything
+            on_buttons = on_buttons.split(',');//split the comma separated values into list
 
-        for (i=0;i<on_buttons.length;i++){
-            xpos = on_buttons[i] % 8;
-            ypos = parseInt(on_buttons[i] / 8);
-            el = document.querySelector('#minefield_play .design_grid > div[data-x="'+xpos+'"][data-y="'+ypos+'"]')
-            if (el.classList.contains('safe')){
-                el.classList.add('pressed')
+            els = document.querySelectorAll('#minefield_play .design_grid > div.dead')//clear the dead squares
+            for (i=0;i<els.length;i++){
+                els[i].classList.remove('dead')
             }
-            else{
-                el.classList.add('dead')
+
+            for (i=0;i<on_buttons.length;i++){
+                xpos = on_buttons[i] % 8;
+                ypos = parseInt(on_buttons[i] / 8);
+                el = document.querySelector('#minefield_play .design_grid > div[data-x="'+xpos+'"][data-y="'+ypos+'"]')
+                
+                if (minefield.states['play'] == false){//hide whats a mine
+                    el.classList.add('pressed')
+                }
+                else{//if we are playing tell the user if they are on mine or not
+                    if (el.classList.contains('safe')){
+                        el.classList.add('pressed')
+                    }
+                    else{
+                        el.classList.add('dead')
+                        minefield.states['dead'] = true
+                    }
+                }
             }
         }
+    }
+    else{
+        minefield.states['dead'] = false
     }
 }
 
@@ -388,7 +410,7 @@ function connect_device(){
                     return service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
                 })
                 .then(characteristic => {
-                    minefield_device = characteristic;
+                    minefield.minefield_device = characteristic;
                     // Set up event listener for when characteristic value changes.
                     characteristic.startNotifications();
                     characteristic.addEventListener('characteristicvaluechanged', recieve_minefield_data);
@@ -409,7 +431,7 @@ function send_to_minefield(command){
     cmd.push(10)
     
     let cmd_formatted = new Uint8Array(cmd);
-    return minefield_device.writeValue(cmd_formatted).catch(error => { console.error(error); }); 
+    return minefield.minefield_device.writeValue(cmd_formatted).catch(error => { console.error(error); }); 
 }
 
     
@@ -418,13 +440,13 @@ function recieve_minefield_data(event) {
     let i = 0;
     while (stop == false){
         try{
-            if (String.fromCharCode(event.target.value.getUint8(i)) == '\r' && minefield_buffer != ''){
-                update_minefield_play(minefield_buffer);
-                minefield_buffer = ''
+            if ((String.fromCharCode(event.target.value.getUint8(i)) == '\r' || String.fromCharCode(event.target.value.getUint8(i)) == '\n') && minefield.minefield_buffer != ''){
+                update_minefield_play(minefield.minefield_buffer);
+                minefield.minefield_buffer = ''
                 i += 2;
             }
             else{
-                minefield_buffer += String.fromCharCode(event.target.value.getUint8(i));
+                minefield.minefield_buffer += String.fromCharCode(event.target.value.getUint8(i));
             }
             i += 1;
         }
@@ -636,10 +658,19 @@ document.addEventListener('click',function(){
 })
 
 
-//variables used to handle the external minefield
-var minefield_device;
-var minefield_buffer = '';
-var minefield_update_interval;
+//minefield class to contain all the associated data with the minefield 
+class Minefield{
+    constructor(){
+        this.minefield_device;
+        this.minefield_buffer = '';
+        this.minefield_update_interval;
+        this.states = {
+            'dead':false,
+            'play':false
+        }
+    }
+}
+var minefield = new Minefield()
 
 </script>
 
