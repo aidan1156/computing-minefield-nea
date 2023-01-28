@@ -297,6 +297,33 @@ def get_leaderboard():
 
     return leaderboard
 
+def add_leaderboard(design_id,time,mistakes,teamname):
+    num_sqaures = len(get_design(design_id))
+
+    mistakes = int(mistakes)
+    time = int(time)
+    design_id = int(design_id)
+    teamname = clean_for_sql(teamname)
+
+    score = int(((2.714 ** (-0.01 * time)) * (num_sqaures ** 1.8)) / (mistakes + 1))
+
+    if teamname == '':
+        teamname = 'Unnamed Team'
+
+    conn = sqlite3.connect("users.db")
+    cur = conn.cursor()
+
+    sql= f'''
+        INSERT INTO attempts
+        VALUES ('{design_id}', '{time}', '{mistakes}', {score}, '{teamname}')
+    '''
+
+    cur.execute(sql)
+
+    cur.close()
+    conn.commit()
+    conn.close()
+
 def sign_out(user_id):
     user_id = int(user_id)
     conn = sqlite3.connect("users.db")

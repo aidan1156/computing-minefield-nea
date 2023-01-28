@@ -113,6 +113,18 @@
     </div>
 </div>
 
+<!-- confirm teamname for play popup -->
+<div class='popup-parent hidden' id='teamname_confirm_popup'>
+    <div class='popup'>
+        <h2>Add teamname</h2>
+        <span>Your team is currently unnamed, do you want to name it?</span>
+        <div>
+            <button class='borderless' onclick='upload_attempt()'>No</button>
+            <button class='borderless' onclick='edit_teamname_to_upload()'>Yes</button>
+        </div>
+    </div>
+</div>
+
 <!-- account popup -->
 <div id='account_popup_parent' onclick='document.getElementById("account_popup_parent").style.display=""'>
     <div id="account_popup" onclick='window.event.stopPropagation()'>
@@ -324,6 +336,7 @@ async function play_design(id){//play the inputted design id
                 //start getting data on button presses
                 minefield.states['play'] = false;
                 minefield.states['dead'] = false;
+                minefield.sending_data = true;
                 send_to_minefield('g')//send the start command to receive data
             }
             else{
@@ -333,9 +346,12 @@ async function play_design(id){//play the inputted design id
     }    
 }
 
-function close_play_design(){//close the play field
+function close_play_design(close_window=true){//close the play field
     minefield.states['play'] = false;
-    document.getElementById('minefield_play').style.display = ''
+    if (close_window){//if we should also hide the play field window
+        document.getElementById('minefield_play').style.display = ''
+    }
+    minefield.sending_data = false
     send_to_minefield('s')//stop the data being sent
     clearInterval(minefield.minefield_update_interval)
 }
@@ -359,6 +375,7 @@ function update_minefield_play(on_buttons){//take the pressed buttons and update
         els[i].classList.remove('pressed')
     }
 
+    console.log(onbuttons)
     if (on_buttons != 'nothing'){
         if (minefield.states['dead'] == false){//freeze any board updates until they arent pressing anything
             on_buttons = on_buttons.split(',');//split the comma separated values into list
@@ -379,9 +396,39 @@ function update_minefield_play(on_buttons){//take the pressed buttons and update
                 else{//if we are playing tell the user if they are on mine or not
                     if (el.classList.contains('safe')){
                         el.classList.add('pressed')
+
+                        //if they reached the end
+                        if (el.dataset.y == '0' && parseInt(el.dataset.x) < 4){
+                            //stop recieving data about minefield 
+                            close_play_design(close_window=false)
+                            
+                            //display the path to the users
+                            els = document.querySelectorAll('#minefield_play .design_grid > div.pressed')
+                            for (i=0;i<els.length;i++){
+                                els[i].classList.remove('pressed')
+                            }
+
+                            els = document.querySelectorAll('#minefield_play .design_grid > div.safe')
+                            for (i=0;i<els.length;i++){
+                                els[i].classList.add('pressed')
+                            }
+
+                            if (document.getElementById('play_teamname').value == ''){//if there is currently no teamname
+                                document.getElementById('teamname_confirm_popup').classList.remove('hidden')
+                            }
+                            else{
+                                document.getElementById('play_teamname').disabled = true
+                                upload_attempt()
+                            }
+                        }
                     }
                     else{
+                        if (el.classList.contains('exploded')){//if they have stepped on the mine before
+                            //increment the mistakes counter
+                            document.querySelector('#play_mistakes').innerHTML = (parseInt(document.querySelector('#play_mistakes').innerHTML)+1+'').padStart(2, "0")
+                        }
                         el.classList.add('dead')
+                        el.classList.add('exploded')
                         minefield.states['dead'] = true
                     }
                 }
@@ -391,6 +438,33 @@ function update_minefield_play(on_buttons){//take the pressed buttons and update
     else{
         minefield.states['dead'] = false
     }
+}
+
+function upload_attempt(){
+    document.getElementById('teamname_confirm_popup').classList.add('hidden')
+
+    mistakes = parseInt(document.querySelector('#play_mistakes').innerHTML)
+    time = parseInt(new Date()/1000) - parseInt(document.querySelector('#minefield_play').dataset.start_time)
+    id = document.querySelector('#minefield_play').dataset.id
+    name = document.getElementById('play_teamname').value
+    post_request('/',function(data){
+        document.getElementById('play_teamname').disabled = ''
+        document.getElementById('play_teamname').addEventListener('focusout', (event) => {
+        })
+        update_leaderboard()
+    },{'user_token':localStorage.getItem('user_token'),'request_type':'add_attempt','time':time,'mistakes':mistakes,'id':id,'name':name})
+}
+
+
+function edit_teamname_to_upload(){
+    document.getElementById('teamname_confirm_popup').classList.add('hidden')
+    //tab the user into the input box
+    document.getElementById('play_teamname').focus()
+    //once they input the name upload the attempt
+    document.getElementById('play_teamname').addEventListener('focusout', (event) => {
+        document.getElementById('play_teamname').disabled = true
+        upload_attempt()
+    })
 }
 
 
@@ -436,6 +510,10 @@ function send_to_minefield(command){
 
     
 function recieve_minefield_data(event) {
+    if (minefield.sending_data == false){
+        send_to_minefield('s')
+        return;
+    }
     let stop = false;
     let i = 0;
     while (stop == false){
@@ -446,7 +524,12 @@ function recieve_minefield_data(event) {
                 i += 2;
             }
             else{
-                minefield.minefield_buffer += String.fromCharCode(event.target.value.getUint8(i));
+                tmp = String.fromCharCode(event.target.value.getUint8(i))
+                if (tmp != ',' && isNaN(tmp)){
+                    tmp = ''
+                    
+                }
+                minefield.minefield_buffer += tmp;
             }
             i += 1;
         }
@@ -552,39 +635,43 @@ post_request('/',function(data){
 },{'request_type':'get_designs','user_token':localStorage.getItem('user_token')})
 
 //get the current leaderboard
-post_request('/',function(data){
-    data = JSON.parse(data)
-    if (data['state'] == 'done'){
-        for (i=0;i<data['leaderboard'].length;i++){
-            a = document.createElement('DIV');
-            a.setAttribute('class','leaderboard_result')
-            if (i == 0){
-                a.classList.add('first')
+function update_leaderboard(){
+    document.getElementById('leaderboard_main').innerHTML = ''
+    post_request('/',function(data){
+        data = JSON.parse(data)
+        if (data['state'] == 'done'){
+            for (i=0;i<data['leaderboard'].length;i++){
+                a = document.createElement('DIV');
+                a.setAttribute('class','leaderboard_result')
+                if (i == 0){
+                    a.classList.add('first')
+                }
+                image = ''
+                if (i == 0){
+                    image =  "<img src='/static/ui_icons/first.png'>"
+                }
+                if (i == 1){
+                    image =  "<img src='/static/ui_icons/second.png'>"
+                }
+                if (i == 2){
+                    image =  "<img src='/static/ui_icons/third.png'>"
+                }
+                a.innerHTML = `
+                    ${image}
+                    <div class='leaderboard_place'>#${i+1}</div>
+                    <div class='leaderboard_name'>${data['leaderboard'][i]['name']}</div>
+                    <div class='leaderboard_time'>Time elapsed: ${data['leaderboard'][i]['time']}</div>
+                    <div class='leaderboard_mistakes'>Mistakes: ${data['leaderboard'][i]['mistakes']}</div>
+                `
+                document.getElementById('leaderboard_main').appendChild(a)
             }
-            image = ''
-            if (i == 0){
-                image =  "<img src='/static/ui_icons/first.png'>"
-            }
-            if (i == 1){
-                image =  "<img src='/static/ui_icons/second.png'>"
-            }
-            if (i == 2){
-                image =  "<img src='/static/ui_icons/third.png'>"
-            }
-            a.innerHTML = `
-                ${image}
-                <div class='leaderboard_place'>#${i+1}</div>
-                <div class='leaderboard_name'>${data['leaderboard'][i]['name']}</div>
-                <div class='leaderboard_time'>Time elapsed: ${data['leaderboard'][i]['time']}</div>
-                <div class='leaderboard_mistakes'>Mistakes: ${data['leaderboard'][i]['mistakes']}</div>
-            `
-            document.getElementById('leaderboard_main').appendChild(a)
         }
-    }
-    else{
-        create_bottom_alert('Failed to get leaderboard')
-    }
-},{'request_type':'get_leaderboard','user_token':localStorage.getItem('user_token')})
+        else{
+            create_bottom_alert('Failed to get leaderboard')
+        }
+    },{'request_type':'get_leaderboard','user_token':localStorage.getItem('user_token')})
+}
+update_leaderboard()
 
 
 function show_options(el,id,data){
@@ -668,6 +755,7 @@ class Minefield{
             'dead':false,
             'play':false
         }
+        this.sending_data = false;
     }
 }
 var minefield = new Minefield()

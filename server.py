@@ -71,6 +71,10 @@ def home():
                 return resp
             except:
                 return json.dumps({'state':'failed'})
+        if data['request_type'] == 'add_attempt':
+            user_id = server_query.token_to_user_id(data['user_token'],request.cookies.get('user_token'))
+            server_query.add_leaderboard(data['id'],data['time'],data['mistakes'],data['name'])
+            return json.dumps({'state':'done'})
 
 @app.route('/sign-in',methods=['GET','POST'])
 def sign_in():
