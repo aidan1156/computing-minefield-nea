@@ -375,7 +375,6 @@ function update_minefield_play(on_buttons){//take the pressed buttons and update
         els[i].classList.remove('pressed')
     }
 
-    console.log(onbuttons)
     if (on_buttons != 'nothing'){
         if (minefield.states['dead'] == false){//freeze any board updates until they arent pressing anything
             on_buttons = on_buttons.split(',');//split the comma separated values into list
@@ -536,8 +535,7 @@ function recieve_minefield_data(event) {
         catch{
             stop = true;
         }
-    }    
-    //console.log('Battery percentage is ' + batteryLevel);
+    }
 }
 
 
